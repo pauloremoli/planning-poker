@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "tsc -w",
     "start": "ts-node src/index.ts",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' src/index.ts"
   },
   "author": "",
   "license": "ISC",

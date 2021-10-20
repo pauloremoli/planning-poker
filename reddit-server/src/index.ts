@@ -28,10 +28,9 @@ const main = async () => {
     await apolloServer.start();
     apolloServer.applyMiddleware({
         app,
-        cors: false,
     });
 
-    const port = 3000;
+    const port = 3001;
     app.listen(port, () => {
         console.log(`App listening at http://localhost:${port}`)
     })
