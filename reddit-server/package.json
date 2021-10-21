@@ -7,8 +7,8 @@
     "watch": "tsc -w",
     "start": "ts-node src/index.ts",
     "dev": "nodemon dist/index.js",
-    "create:migration" : "mikro-orm migration:create",
-    "up:migration" : "mikro-orm migration:up"
+    "create:migration": "mikro-orm migration:create",
+    "up:migration": "mikro-orm migration:up"
   },
   "author": "",
   "license": "ISC",
@@ -32,6 +32,7 @@
     "@mikro-orm/migrations": "^4.5.9",
     "@mikro-orm/postgresql": "^4.5.9",
     "apollo-server-express": "^3.4.0",
+    "argon2": "^0.28.2",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "graphql": "^15.6.1",

@@ -11,9 +11,7 @@ export default {
         pattern: /^[\w-]+\d+\.[tj]s$/, // regex pattern for the migration files
       },
     entities: [Post, User],
-    dbName: process.env.DB_NAME,
-    user: process.env.USERNAME,
-    password: process.env.PASSWORD,
+    clientUrl: process.env.DATABASE_URL,
     type: 'postgresql',
     debug: !__prod__,
   } as Parameters<typeof MikroORM.init>[0];

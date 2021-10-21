@@ -43,17 +43,18 @@ export class UserResolver {
         return user;
     }
 
-    @Mutation(() => User)
+    @Mutation(() => UserResponse)
     async login(
         @Arg('user') userInput: UserInput,
         @Ctx() { em }: MyContext
     ): Promise<UserResponse> {
-        const user = await em.findOne(User, { username: userInput.username });
+        let user = await em.findOne(User, { username: userInput.username })!;
         if (!user) {
-            errors: [{
+            return { 
+                errors: [{
                 field: "username",
                 message: "Username doesn't exist"
-            }]
+            }]};
         }
 
         const valid = await argon2.verify(user!.password, userInput.password);
@@ -61,10 +62,10 @@ export class UserResolver {
             errors: [{
                 field: "password",
                 message: "Incorrect password"
-            }]
+            }];
         }
 
-        return { user, };
+        return { user };
     }
 
 }
