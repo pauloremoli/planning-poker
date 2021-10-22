@@ -11,11 +11,10 @@ import redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 
-require("dotenv").config();
+require("dotenv-safe").config();
 
 const main = async () => {
     const orm = await MikroORM.init(mikroConfig);
-    await orm.getMigrator().up();
 
     const app = express();
 
@@ -54,9 +53,9 @@ const main = async () => {
         app,
     });
 
-    const port = 3001;
+    const port = process.env.PORT;
     app.listen(port, () => {
-        console.log(`App listening at http://localhost:${port}`);
+        console.log(`App listening at http://localhost:${port}/graphql`);
     });
 };
 

@@ -3,7 +3,7 @@ import { __prod__ } from "./constants";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
 import path from "path";
-require("dotenv").config();
+require("dotenv-safe").config();
 
 export default {
     migrations: {
