@@ -23,6 +23,7 @@
     "@types/connect-redis": "^0.0.17",
     "@types/express": "^4.17.13",
     "@types/express-session": "^1.17.4",
+    "@types/morgan": "^1.9.3",
     "@types/node": "^16.11.1",
     "@types/redis": "^2.8.32",
     "nodemon": "^2.0.14",
@@ -41,8 +42,10 @@
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "graphql": "^15.6.1",
+    "morgan": "^1.10.0",
     "pg": "^8.7.1",
     "redis": "^3.1.2",
-    "type-graphql": "^1.1.1"
+    "type-graphql": "^1.1.1",
+    "winston": "^3.3.3"
   }
 }

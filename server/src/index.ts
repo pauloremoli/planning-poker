@@ -7,9 +7,11 @@ import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
+import winston from "winston";
 import redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
+import morgan from 'morgan';
 
 require("dotenv-safe").config();
 
@@ -17,6 +19,31 @@ const main = async () => {
     const orm = await MikroORM.init(mikroConfig);
 
     const app = express();
+
+    app.use(morgan('dev'));
+    const logger = winston.createLogger({
+        level: 'info',
+        format: winston.format.json(),
+        defaultMeta: { service: 'user-service' },
+        transports: [
+            //
+            // - Write all logs with level `error` and below to `error.log`
+            // - Write all logs with level `info` and below to `combined.log`
+            //
+            new winston.transports.File({ filename: 'error.log', level: 'error' }),
+            new winston.transports.File({ filename: 'combined.log' }),
+        ],
+    });
+
+    //
+    // If we're not in production then log to the `console` with the format:
+    // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+    //
+    if (__prod__) {
+        logger.add(new winston.transports.Console({
+            format: winston.format.simple(),
+        }));
+    }
 
     let RedisStore = connectRedis(session);
     let redisClient = redis.createClient();

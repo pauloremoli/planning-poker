@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.4.16",
+    "@chakra-ui/icons": "^1.0.0",
+    "@chakra-ui/react": "^1.4.2",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
+    "formik": "^2.2.9",
+    "framer-motion": "^4.0.3",
+    "graphql": "^15.6.1",
+    "next": "latest",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.4.4"
+  }
+}
