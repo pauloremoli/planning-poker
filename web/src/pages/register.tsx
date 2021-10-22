@@ -1,5 +1,5 @@
-import React from 'react';
-import { Form, Formik } from 'formik';
+import React from "react";
+import { Form, Formik } from "formik";
 import {
     Flex,
     Box,
@@ -7,64 +7,86 @@ import {
     Button,
     Heading,
     useColorModeValue,
-} from '@chakra-ui/react';
-import InputField from '../components/InputField';
-import BoxWrapper from '../components/BoxWrapper';
-import { gql, useMutation } from '@apollo/client';
+} from "@chakra-ui/react";
+import InputField from "../components/InputField";
+import BoxWrapper from "../components/BoxWrapper";
+import { useRegisterMutation, UserInput } from "../generated/graphql";
+import { toErrorMap } from "../utils/toErrorMap";
+import { useRouter } from "next/router";
 
-interface RegisterProps { }
+interface RegisterProps {}
 
-const REGISTER_MUTATION = gql`
-    mutation Register($user: UserInput!) {
-        register(user: $user) {
-        errors {
-            field
-            message
-        }
-        user {
-            id
-            username
-        }
-        }
-    }
-`;
+const Register: React.FC<RegisterProps> = ({}) => {
+    const [registerMutation, { data, loading, error }] = useRegisterMutation();
+    const router = useRouter();
 
-const Register: React.FC<RegisterProps> = ({ }) => {
-    const [registerMutation, { data, loading, error }] = useMutation(REGISTER_MUTATION);
     return (
         <BoxWrapper>
             <Formik
                 initialValues={{ username: "", password: "" }}
-                onSubmit={(values) => {
-                    return registerMutation({ user: values })
+                onSubmit={async (values: UserInput, { setErrors }) => {
+                    const response = await registerMutation({
+                        variables: { ...values },
+                    });
+
+                    if (response.data?.register.errors) {
+                        setErrors(toErrorMap(response.data?.register.errors));
+                    }
+                    else if(response.data?.register.user){
+                        router.push("/");
+                    }
+
+                    console.log(response.data);
                 }}
             >
                 {({ isSubmitting }) => (
                     <Form>
                         <Flex
-                            minH={'100vh'}
-                            align={'center'}
-                            justify={'center'}
-                            bg={useColorModeValue('gray.50', 'gray.800')}>
-                            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
-                                <Stack align={'center'}>
-                                    <Heading fontSize={'4xl'}>Create your account</Heading>
+                            minH={"100vh"}
+                            align={"center"}
+                            justify={"center"}
+                            bg={useColorModeValue("gray.50", "gray.800")}
+                        >
+                            <Stack
+                                spacing={8}
+                                mx={"auto"}
+                                maxW={"lg"}
+                                py={12}
+                                px={6}
+                            >
+                                <Stack align={"center"}>
+                                    <Heading fontSize={"4xl"}>
+                                        Create your account
+                                    </Heading>
                                 </Stack>
                                 <Box
-                                    rounded={'lg'}
-                                    bg={useColorModeValue('white', 'gray.700')}
-                                    boxShadow={'lg'}
-                                    p={8}>
+                                    rounded={"lg"}
+                                    bg={useColorModeValue("white", "gray.700")}
+                                    boxShadow={"lg"}
+                                    p={8}
+                                >
                                     <Stack spacing={4}>
-                                        <InputField label="Username" name="username" placeholder="username" />
-                                        <InputField label="Password" name="password" placeholder="password" type="password" />
+                                        <InputField
+                                            label="Username"
+                                            name="username"
+                                            placeholder="username"
+                                        />
+                                        <InputField
+                                            label="Password"
+                                            name="password"
+                                            placeholder="password"
+                                            type="password"
+                                        />
                                         <Stack spacing={10}>
                                             <Button
-                                                bg={'blue.400'}
-                                                color={'white'}
+                                                bg={"blue.400"}
+                                                color={"white"}
                                                 _hover={{
-                                                    bg: 'blue.500',
-                                                }} type="submit" isLoading={isSubmitting}>
+                                                    bg: "blue.500",
+                                                }}
+                                                type="submit"
+                                                isLoading={isSubmitting}
+                                            >
                                                 Register
                                             </Button>
                                         </Stack>
@@ -73,11 +95,11 @@ const Register: React.FC<RegisterProps> = ({ }) => {
                             </Stack>
                         </Flex>
                     </Form>
-
                 )}
-            </Formik>);
+            </Formik>
+            );
         </BoxWrapper>
-    )
-}
+    );
+};
 
 export default Register;

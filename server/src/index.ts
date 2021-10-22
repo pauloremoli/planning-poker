@@ -11,7 +11,8 @@ import winston from "winston";
 import redis from "redis";
 import session from "express-session";
 import connectRedis from "connect-redis";
-import morgan from 'morgan';
+import morgan from "morgan";
+import cors from "cors";
 
 require("dotenv-safe").config();
 
@@ -19,19 +20,23 @@ const main = async () => {
     const orm = await MikroORM.init(mikroConfig);
 
     const app = express();
+    app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 
-    app.use(morgan('dev'));
+    app.use(morgan("dev"));
     const logger = winston.createLogger({
-        level: 'info',
+        level: "info",
         format: winston.format.json(),
-        defaultMeta: { service: 'user-service' },
+        defaultMeta: { service: "user-service" },
         transports: [
             //
             // - Write all logs with level `error` and below to `error.log`
             // - Write all logs with level `info` and below to `combined.log`
             //
-            new winston.transports.File({ filename: 'error.log', level: 'error' }),
-            new winston.transports.File({ filename: 'combined.log' }),
+            new winston.transports.File({
+                filename: "error.log",
+                level: "error",
+            }),
+            new winston.transports.File({ filename: "combined.log" }),
         ],
     });
 
@@ -40,9 +45,11 @@ const main = async () => {
     // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
     //
     if (__prod__) {
-        logger.add(new winston.transports.Console({
-            format: winston.format.simple(),
-        }));
+        logger.add(
+            new winston.transports.Console({
+                format: winston.format.simple(),
+            })
+        );
     }
 
     let RedisStore = connectRedis(session);
@@ -78,6 +85,7 @@ const main = async () => {
     await apolloServer.start();
     apolloServer.applyMiddleware({
         app,
+        cors: false
     });
 
     const port = process.env.PORT;

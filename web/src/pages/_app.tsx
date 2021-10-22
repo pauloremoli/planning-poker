@@ -5,15 +5,30 @@ import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
-  useQuery,
-  gql
+  from,
+  HttpLink,
 } from "@apollo/client";
+import { onError } from "@apollo/client/link/error";
 
 function MyApp({ Component, pageProps }) {
 
+  const errorLink = onError(({graphQLErrors}) => {
+    if (graphQLErrors) {
+      graphQLErrors.map(({ message }) => {
+        alert(`Graphql error ${message}`);
+      });
+    }
+  });
+  
+  const link = from([
+    errorLink,
+    new HttpLink({ uri: "http://localhost:3001/graphql" }),
+  ]);
+  
   const client = new ApolloClient({
-    uri: 'https://localhost:3001/graphql',
     cache: new InMemoryCache(),
+    link: link,
+    credentials: "include",
   });
 
   return (

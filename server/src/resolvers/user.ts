@@ -65,7 +65,7 @@ export class UserResolver {
                     {
                         field: "username",
                         message:
-                            "Username size must have at least 2 characters",
+                            "Must have at least 2 characters",
                     },
                 ],
             };
@@ -77,7 +77,7 @@ export class UserResolver {
                     {
                         field: "password",
                         message:
-                            "Password size must have at least 3 characters",
+                            "Must have at least 3 characters",
                     },
                 ],
             };
