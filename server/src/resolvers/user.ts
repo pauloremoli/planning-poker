@@ -40,20 +40,16 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-
-    @Query(() => User, {nullable: true})
-    async me(
-        @Ctx() { req, em }: MyContext
-    )
-    {
-        if(!req.session.userId){
+    @Query(() => User, { nullable: true })
+    async me(@Ctx() { req, em }: MyContext) {
+        if (!req.session.userId) {
             return null;
         }
 
-        const user = await em.findOne(User, {id: req.session.userId});
+        const user = await em.findOne(User, { id: req.session.userId });
         return user;
     }
-       
+
     @Mutation(() => UserResponse)
     async register(
         @Arg("user") userInput: UserInput,
@@ -64,8 +60,7 @@ export class UserResolver {
                 errors: [
                     {
                         field: "username",
-                        message:
-                            "Must have at least 2 characters",
+                        message: "Must have at least 2 characters",
                     },
                 ],
             };
@@ -76,8 +71,7 @@ export class UserResolver {
                 errors: [
                     {
                         field: "password",
-                        message:
-                            "Must have at least 3 characters",
+                        message: "Must have at least 3 characters",
                     },
                 ],
             };
@@ -115,7 +109,7 @@ export class UserResolver {
 
         //set cookie to keep user logged in
         req.session.userId = user.id;
-    
+
         return { user };
     }
 
@@ -125,6 +119,9 @@ export class UserResolver {
         @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
         let user = await em.findOne(User, { username: userInput.username })!;
+
+        console.log(req.session.userId);
+        
         if (!user) {
             return {
                 errors: [
@@ -138,12 +135,14 @@ export class UserResolver {
 
         const valid = await argon2.verify(user!.password, userInput.password);
         if (!valid) {
-            errors: [
-                {
-                    field: "password",
-                    message: "Incorrect password",
-                },
-            ];
+            return {
+                errors: [
+                    {
+                        field: "password",
+                        message: "Incorrect password",
+                    },
+                ],
+            };
         }
 
         req.session.userId = user.id;

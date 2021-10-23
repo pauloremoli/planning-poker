@@ -63,8 +63,9 @@ const main = async () => {
                 maxAge: 315569520000, // 10 years
                 httpOnly: true,
                 secure: __prod__,
+                sameSite: "lax",
             },
-            saveUninitialized: false,
+            saveUninitialized: true,
             secret: process.env.REDIS_SECRET!,
             resave: false,
         })
@@ -85,7 +86,7 @@ const main = async () => {
     await apolloServer.start();
     apolloServer.applyMiddleware({
         app,
-        cors: false
+        cors: false,
     });
 
     const port = process.env.PORT;

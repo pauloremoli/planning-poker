@@ -7,18 +7,21 @@ import {
     Button,
     Heading,
     useColorModeValue,
+    Checkbox,
+    Link,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 import InputField from "../components/InputField";
 import BoxWrapper from "../components/BoxWrapper";
-import { useRegisterMutation, UserInput } from "../generated/graphql";
+import { useLoginMutation, UserInput } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
 
-interface RegisterProps {}
+interface LoginProps {}
 
-const Register: React.FC<RegisterProps> = ({}) => {
-    const [registerMutation] = useRegisterMutation();
+const Login: React.FC<LoginProps> = ({}) => {
+    const [LoginMutation] = useLoginMutation();
     const router = useRouter();
 
     return (
@@ -28,15 +31,13 @@ const Register: React.FC<RegisterProps> = ({}) => {
                 <Formik
                     initialValues={{ username: "", password: "" }}
                     onSubmit={async (values: UserInput, { setErrors }) => {
-                        const response = await registerMutation({
+                        const response = await LoginMutation({
                             variables: { ...values },
                         });
 
-                        if (response.data?.register.errors) {
-                            setErrors(
-                                toErrorMap(response.data?.register.errors)
-                            );
-                        } else if (response.data?.register.user) {
+                        if (response.data?.login.errors) {
+                            setErrors(toErrorMap(response.data?.login.errors));
+                        } else if (response.data?.login.user) {
                             router.push("/");
                         }
 
@@ -60,7 +61,7 @@ const Register: React.FC<RegisterProps> = ({}) => {
                                 >
                                     <Stack align={"center"}>
                                         <Heading fontSize={"4xl"}>
-                                            Create your account
+                                            Log in to your account
                                         </Heading>
                                     </Stack>
                                     <Box
@@ -85,6 +86,25 @@ const Register: React.FC<RegisterProps> = ({}) => {
                                                 type="password"
                                             />
                                             <Stack spacing={10}>
+                                                <Stack
+                                                    direction={{
+                                                        base: "column",
+                                                        sm: "row",
+                                                    }}
+                                                    align={"start"}
+                                                    justify={"space-between"}
+                                                >
+                                                    <Checkbox>
+                                                        Remember me
+                                                    </Checkbox>
+                                                    <NextLink href="forgot-password">
+                                                        <Link
+                                                            color={"blue.400"}
+                                                        >
+                                                            Forgot password?
+                                                        </Link>
+                                                    </NextLink>
+                                                </Stack>
                                                 <Button
                                                     bg={"blue.400"}
                                                     color={"white"}
@@ -94,7 +114,7 @@ const Register: React.FC<RegisterProps> = ({}) => {
                                                     type="submit"
                                                     isLoading={isSubmitting}
                                                 >
-                                                    Register
+                                                    Login
                                                 </Button>
                                             </Stack>
                                         </Stack>
@@ -110,4 +130,4 @@ const Register: React.FC<RegisterProps> = ({}) => {
     );
 };
 
-export default Register;
+export default Login;

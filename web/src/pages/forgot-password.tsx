@@ -10,15 +10,12 @@ import {
 } from "@chakra-ui/react";
 import InputField from "../components/InputField";
 import BoxWrapper from "../components/BoxWrapper";
-import { useRegisterMutation, UserInput } from "../generated/graphql";
-import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
 
-interface RegisterProps {}
+interface ForgotPasswordProps {}
 
-const Register: React.FC<RegisterProps> = ({}) => {
-    const [registerMutation] = useRegisterMutation();
+const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
     const router = useRouter();
 
     return (
@@ -26,21 +23,9 @@ const Register: React.FC<RegisterProps> = ({}) => {
             <Navbar />
             <BoxWrapper>
                 <Formik
-                    initialValues={{ username: "", password: "" }}
-                    onSubmit={async (values: UserInput, { setErrors }) => {
-                        const response = await registerMutation({
-                            variables: { ...values },
-                        });
-
-                        if (response.data?.register.errors) {
-                            setErrors(
-                                toErrorMap(response.data?.register.errors)
-                            );
-                        } else if (response.data?.register.user) {
-                            router.push("/");
-                        }
-
-                        console.log(response.data);
+                    initialValues={{ email: "" }}
+                    onSubmit={async (values, { setErrors }) => {
+                        router.push("/");
                     }}
                 >
                     {({ isSubmitting }) => (
@@ -74,15 +59,9 @@ const Register: React.FC<RegisterProps> = ({}) => {
                                     >
                                         <Stack spacing={4}>
                                             <InputField
-                                                label="Username"
-                                                name="username"
-                                                placeholder="username"
-                                            />
-                                            <InputField
-                                                label="Password"
-                                                name="password"
-                                                placeholder="password"
-                                                type="password"
+                                                label="Email"
+                                                name="email"
+                                                placeholder="Email"
                                             />
                                             <Stack spacing={10}>
                                                 <Button
@@ -94,7 +73,7 @@ const Register: React.FC<RegisterProps> = ({}) => {
                                                     type="submit"
                                                     isLoading={isSubmitting}
                                                 >
-                                                    Register
+                                                    Forgot password
                                                 </Button>
                                             </Stack>
                                         </Stack>
@@ -110,4 +89,4 @@ const Register: React.FC<RegisterProps> = ({}) => {
     );
 };
 
-export default Register;
+export default ForgotPassword;
