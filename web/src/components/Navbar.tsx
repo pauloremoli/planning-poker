@@ -3,9 +3,12 @@ import React from "react";
 import NextLink from "next/link";
 import { useColorModeValue } from "@chakra-ui/react";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
+import { useApolloClient } from "@apollo/client";
 
 export default function Navbar() {
     const [logout, { loading: logoutFetching }] = useLogoutMutation();
+    const apolloClient = useApolloClient();
+
     const { data } = useMeQuery();
 
     let body = null;
@@ -25,6 +28,7 @@ export default function Navbar() {
                         <Button
                             onClick={() => {
                                 logout();
+                                apolloClient.resetStore();
                             }}
                             isLoading={logoutFetching}
                             variant="link"
