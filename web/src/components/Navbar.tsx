@@ -2,9 +2,10 @@ import { Box, Button, Flex, Link, Stack, Text } from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
 import { useColorModeValue } from "@chakra-ui/react";
-import { useMeQuery } from "../generated/graphql";
+import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 
 export default function Navbar() {
+    const [logout, { loading: logoutFetching }] = useLogoutMutation();
     const { data } = useMeQuery();
 
     let body = null;
@@ -21,7 +22,16 @@ export default function Navbar() {
                         </Text>
                     </Box>
                     <NextLink href="/login">
-                        <Button variant="link" color={"white"}>Log out</Button>
+                        <Button
+                            onClick={() => {
+                                logout();
+                            }}
+                            isLoading={logoutFetching}
+                            variant="link"
+                            color={"white"}
+                        >
+                            Log out
+                        </Button>
                     </NextLink>
                 </Flex>
             </>
@@ -47,9 +57,7 @@ export default function Navbar() {
             bg={useColorModeValue("blue.400", "gray.800")}
             color={useColorModeValue("white", "white")}
         >
-            <Box ml={"auto"}>
-                {body}
-            </Box>
+            <Box ml={"auto"}>{body}</Box>
         </Flex>
     );
 }

@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { __prod__ } from "./constants";
+import { __prod__, COOKIE_NAME } from "./constants";
 import { MikroORM } from "@mikro-orm/core";
 import mikroConfig from "./mikro-orm.config";
 import express from "express";
@@ -20,7 +20,7 @@ const main = async () => {
     const orm = await MikroORM.init(mikroConfig);
 
     const app = express();
-    app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+    app.use(cors({ credentials: true, origin: process.env.CLIENT_DOMAIN }));
 
     app.use(morgan("dev"));
     const logger = winston.createLogger({
@@ -57,7 +57,7 @@ const main = async () => {
 
     app.use(
         session({
-            name: "reddit",
+            name: COOKIE_NAME,
             store: new RedisStore({ client: redisClient, disableTouch: true }),
             cookie: {
                 maxAge: 315569520000, // 10 years
