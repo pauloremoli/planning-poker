@@ -20,7 +20,22 @@ const main = async () => {
     const orm = await MikroORM.init(mikroConfig);
 
     const app = express();
-    app.use(cors({ credentials: true, origin: process.env.CLIENT_DOMAIN }));
+    var whitelist = [
+        process.env.CLIENT_DOMAIN,
+        "https://studio.apollographql.com",
+    ];
+    app.use(
+        cors({
+            credentials: true,
+            origin: function (origin, callback) {
+                if (whitelist.indexOf(origin) !== -1) {
+                    callback(null, true);
+                } else {
+                    callback(new Error("Not allowed by CORS"));
+                }
+            },
+        })
+    );
 
     app.use(morgan("dev"));
     const logger = winston.createLogger({
