@@ -2,7 +2,6 @@ import {
     Resolver,
     Ctx,
     Arg,
-    InputType,
     Field,
     Mutation,
     ObjectType,
@@ -12,15 +11,7 @@ import { User } from "../entities/User";
 import { MyContext } from "../types";
 import argon2 from "argon2";
 import {COOKIE_NAME} from '../constants'
-
-@InputType()
-class UserInput {
-    @Field()
-    username: string;
-
-    @Field()
-    password: string;
-}
+import { sendEmail } from "../utils/sendEmail";
 
 @ObjectType()
 class FieldError {
@@ -41,6 +32,7 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+    
     @Query(() => User, { nullable: true })
     async me(@Ctx() { req, em }: MyContext) {
         if (!req.session.userId) {
@@ -53,10 +45,12 @@ export class UserResolver {
 
     @Mutation(() => UserResponse)
     async register(
-        @Arg("user") userInput: UserInput,
+        @Arg("username") username: string,
+        @Arg("password") password: string,
+        @Arg("email") email: string,
         @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
-        if (userInput.username.length <= 2) {
+        if (username.length <= 2) {
             return {
                 errors: [
                     {
@@ -67,7 +61,7 @@ export class UserResolver {
             };
         }
 
-        if (userInput.password.length < 3) {
+        if (password.length < 3) {
             return {
                 errors: [
                     {
@@ -77,15 +71,16 @@ export class UserResolver {
                 ],
             };
         }
-        const hashedPassword = await argon2.hash(userInput.password);
+        const hashedPassword = await argon2.hash(password);
         const user = em.create(User, {
-            username: userInput.username,
+            username: username,
             password: hashedPassword,
+            email: email,
         });
         try {
             await em.persistAndFlush(user);
         } catch (err) {
-            console.log(err);
+            console.log(err.details);
 
             if (err.code === "23505") {
                 return {
@@ -116,10 +111,11 @@ export class UserResolver {
 
     @Mutation(() => UserResponse)
     async login(
-        @Arg("user") userInput: UserInput,
+        @Arg("username") username: string,
+        @Arg("password") password: string,
         @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
-        let user = await em.findOne(User, { username: userInput.username })!;
+        let user = await em.findOne(User, { username })!;
 
         console.log(req.session.userId);
 
@@ -134,7 +130,7 @@ export class UserResolver {
             };
         }
 
-        const valid = await argon2.verify(user!.password, userInput.password);
+        const valid = await argon2.verify(user!.password, password);
         if (!valid) {
             return {
                 errors: [
@@ -165,6 +161,18 @@ export class UserResolver {
                 resolve(true);
             });
         });
+    }
+
+    @Mutation(() => Boolean)
+    async forgotPassword(
+        @Arg('email') email: string,
+        @Ctx() { em }: MyContext) {
+            const user = await em.findOne(User, {email});
+            if(!user){
+                return false;
+            }
+        sendEmail(email, "Change password");
+        return true;
     }
 }
 

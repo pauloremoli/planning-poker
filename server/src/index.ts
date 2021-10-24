@@ -18,22 +18,12 @@ require("dotenv-safe").config();
 
 const main = async () => {
     const orm = await MikroORM.init(mikroConfig);
-
     const app = express();
-    var whitelist = [
-        process.env.CLIENT_DOMAIN,
-        "https://studio.apollographql.com",
-    ];
+
     app.use(
         cors({
             credentials: true,
-            origin: function (origin, callback) {
-                if (whitelist.indexOf(origin) !== -1) {
-                    callback(null, true);
-                } else {
-                    callback(new Error("Not allowed by CORS"));
-                }
-            },
+            origin: [!process.env.CLIENT_DOMAIN, "https://studio.apollographql.com"],
         })
     );
 

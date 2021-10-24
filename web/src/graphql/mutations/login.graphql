@@ -1,12 +1,12 @@
-
-mutation login($username: String!, $password: String!) {
-    login(user: { username: $username, password: $password }) {
-        user {
-            ...UserFragment
-        }
-        errors {
-            field
-            message
-        }
+mutation Login($password: String!, $username: String!) {
+  login(password: $password, username: $username) {
+    user {
+      username
+      id
     }
+    errors {
+      field
+      message
+    }
+  }
 }

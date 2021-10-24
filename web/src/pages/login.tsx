@@ -13,7 +13,7 @@ import {
 import NextLink from "next/link";
 import InputField from "../components/InputField";
 import BoxWrapper from "../components/BoxWrapper";
-import { useLoginMutation, UserInput } from "../generated/graphql";
+import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
@@ -30,7 +30,7 @@ const Login: React.FC<LoginProps> = ({}) => {
             <BoxWrapper>
                 <Formik
                     initialValues={{ username: "", password: "" }}
-                    onSubmit={async (values: UserInput, { setErrors }) => {
+                    onSubmit={async (values, { setErrors }) => {
                         const response = await LoginMutation({
                             variables: { ...values },
                         });

@@ -17,6 +17,7 @@ interface ForgotPasswordProps {}
 
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
     const router = useRouter();
+    const [{}] = useForgotPasswordMutation()
 
     return (
         <>

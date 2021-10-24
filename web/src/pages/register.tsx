@@ -10,14 +10,15 @@ import {
 } from "@chakra-ui/react";
 import InputField from "../components/InputField";
 import BoxWrapper from "../components/BoxWrapper";
-import { useRegisterMutation, UserInput } from "../generated/graphql";
+import { useRegisterMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
+import { withApollo } from '../utils/withApollo';
 
-interface RegisterProps {}
+interface RegisterProps { }
 
-const Register: React.FC<RegisterProps> = ({}) => {
+const Register: React.FC<RegisterProps> = ({ }) => {
     const [registerMutation] = useRegisterMutation();
     const router = useRouter();
 
@@ -26,8 +27,8 @@ const Register: React.FC<RegisterProps> = ({}) => {
             <Navbar />
             <BoxWrapper>
                 <Formik
-                    initialValues={{ username: "", password: "" }}
-                    onSubmit={async (values: UserInput, { setErrors }) => {
+                    initialValues={{ username: "", password: "", email: "" }}
+                    onSubmit={async (values, { setErrors }) => {
                         const response = await registerMutation({
                             variables: { ...values },
                         });
@@ -79,6 +80,11 @@ const Register: React.FC<RegisterProps> = ({}) => {
                                                 placeholder="username"
                                             />
                                             <InputField
+                                                label="Email"
+                                                name="email"
+                                                placeholder="email"
+                                            />
+                                            <InputField
                                                 label="Password"
                                                 name="password"
                                                 placeholder="password"
@@ -110,4 +116,4 @@ const Register: React.FC<RegisterProps> = ({}) => {
     );
 };
 
-export default Register;
+export default withApollo({ ssr: false })(Register);
