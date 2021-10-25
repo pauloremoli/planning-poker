@@ -6,18 +6,20 @@ import {
     Stack,
     Button,
     Heading,
+    Text,
     useColorModeValue,
 } from "@chakra-ui/react";
 import InputField from "../components/InputField";
 import BoxWrapper from "../components/BoxWrapper";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
+import { useForgotPasswordMutation } from "../generated/graphql";
 
 interface ForgotPasswordProps {}
 
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
     const router = useRouter();
-    const [{}] = useForgotPasswordMutation()
+    const [ForgotPasswordMutation] = useForgotPasswordMutation();
 
     return (
         <>
@@ -26,7 +28,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
                 <Formik
                     initialValues={{ email: "" }}
                     onSubmit={async (values, { setErrors }) => {
-                        router.push("/");
+                        const res = await ForgotPasswordMutation();
+                        console.log(res);
+                        router.push("/login");
                     }}
                 >
                     {({ isSubmitting }) => (
@@ -46,8 +50,9 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
                                 >
                                     <Stack align={"center"}>
                                         <Heading fontSize={"4xl"}>
-                                            Create your account
+                                            Forgot password
                                         </Heading>
+                                        <Text>You will receive an email with link to change the password</Text>
                                     </Stack>
                                     <Box
                                         rounded={"lg"}

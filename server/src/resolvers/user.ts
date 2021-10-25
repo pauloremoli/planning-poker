@@ -10,8 +10,9 @@ import {
 import { User } from "../entities/User";
 import { MyContext } from "../types";
 import argon2 from "argon2";
-import {COOKIE_NAME} from '../constants'
+import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from '../constants'
 import { sendEmail } from "../utils/sendEmail";
+import { v4 } from "uuid";
 
 @ObjectType()
 class FieldError {
@@ -32,7 +33,7 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-    
+
     @Query(() => User, { nullable: true })
     async me(@Ctx() { req, em }: MyContext) {
         if (!req.session.userId) {
@@ -149,7 +150,7 @@ export class UserResolver {
 
     @Mutation(() => Boolean)
     logout(@Ctx() { req, res }: MyContext) {
-        
+
         return new Promise((resolve) => {
             res.clearCookie(COOKIE_NAME);
             req.session.destroy((err) => {
@@ -166,13 +167,72 @@ export class UserResolver {
     @Mutation(() => Boolean)
     async forgotPassword(
         @Arg('email') email: string,
-        @Ctx() { em }: MyContext) {
-            const user = await em.findOne(User, {email});
-            if(!user){
-                return false;
-            }
-        sendEmail(email, "Change password");
+        @Ctx() { em, redis }: MyContext) {
+        console.log("forgotPassword", email);
+        
+        const user = await em.findOne(User, { email });
+        if (!user) {
+            console.error("Email not found")
+            return false;
+        }
+        const token = v4();
+        console.log(token);
+        
+        redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3) // 3 days
+        sendEmail(email, `Use this link to change password: <a href=\"http://localhost:3000/change-password/${token}"> Reset password</a>`);
         return true;
+    }
+
+    @Mutation(() => UserResponse)
+    async changePassword(
+        @Arg("token") token: string,
+        @Arg("newPassword") password: string,
+        @Ctx() { em, redis }: MyContext
+    ): Promise<UserResponse> {
+        console.log("changePassword", token);
+        
+        const userId = await redis.get(FORGET_PASSWORD_PREFIX + token);
+        if(!userId){
+            return {
+                errors: [
+                    {
+                        field: "token",
+                        message: "This link is not valid",
+                    },
+                ],
+            };
+        }
+
+        console.log("changePassword, userId=", userId);
+        let user = await em.findOne(User, { id: parseInt(userId) })!;
+        if(!user){
+            return {
+                errors: [
+                    {
+                        field: "token",
+                        message: "User not found",
+                    },
+                ],
+            };
+        }
+
+        if (password.length < 3) {
+            return {
+                errors: [
+                    {
+                        field: "password",
+                        message: "Must have at least 3 characters",
+                    },
+                ],
+            };
+        }
+
+        user.password = await argon2.hash(password);
+        em.persistAndFlush(user);
+
+        await redis.del(FORGET_PASSWORD_PREFIX + token);
+
+        return { user };
     }
 }
 

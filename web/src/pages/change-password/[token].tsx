@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from 'react'
+import { NextPage } from 'next';
+
 import { Form, Formik } from "formik";
 import {
     Flex,
@@ -7,39 +9,43 @@ import {
     Button,
     Heading,
     useColorModeValue,
+    Text
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 import InputField from "../components/InputField";
 import BoxWrapper from "../components/BoxWrapper";
-import { useRegisterMutation } from "../generated/graphql";
+import { useChangePasswordMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
 
-interface RegisterProps { }
+const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
 
-const Register: React.FC<RegisterProps> = ({ }) => {
-    const [registerMutation] = useRegisterMutation();
+    const [ChangePasswordMutation] = useChangePasswordMutation();
     const router = useRouter();
+    const [tokenError, setTokenError] = useState("")
+
 
     return (
         <>
             <Navbar />
             <BoxWrapper>
                 <Formik
-                    initialValues={{ username: "", password: "", email: "" }}
+                    initialValues={{ password: "" }}
                     onSubmit={async (values, { setErrors }) => {
-                        const response = await registerMutation({
-                            variables: { ...values },
+                        const response = await ChangePasswordMutation({
+                            variables: { token, ...values },
                         });
 
-                        if (response.data?.register.errors) {
-                            setErrors(
-                                toErrorMap(response.data?.register.errors)
-                            );
-                        } else if (response.data?.register.user) {
-                            router.push("/");
+                        if (response.data?.changePassword.errors) {
+                            const errorMap = toErrorMap(response.data?.login.errors)
+                            setErrors(errorMap);
+                            if ('token' in errorMap) {
+                                setTokenError(errorMap.token);
+                            }
+                        } else if (response.data?.login.user) {
+                            router.push("/login");
                         }
-
                     }}
                 >
                     {({ isSubmitting }) => (
@@ -59,7 +65,7 @@ const Register: React.FC<RegisterProps> = ({ }) => {
                                 >
                                     <Stack align={"center"}>
                                         <Heading fontSize={"4xl"}>
-                                            Create your account
+                                            Change password
                                         </Heading>
                                     </Stack>
                                     <Box
@@ -73,22 +79,14 @@ const Register: React.FC<RegisterProps> = ({ }) => {
                                     >
                                         <Stack spacing={4}>
                                             <InputField
-                                                label="Username"
-                                                name="username"
-                                                placeholder="username"
-                                            />
-                                            <InputField
-                                                label="Email"
-                                                name="email"
-                                                placeholder="email"
-                                            />
-                                            <InputField
-                                                label="Password"
+                                                label="New password"
                                                 name="password"
                                                 placeholder="password"
                                                 type="password"
                                             />
+                                            {tokenError ? <Box><Text color="red">{tokenError}</Text></Box> : null}
                                             <Stack spacing={10}>
+
                                                 <Button
                                                     bg={"blue.400"}
                                                     color={"white"}
@@ -98,7 +96,7 @@ const Register: React.FC<RegisterProps> = ({ }) => {
                                                     type="submit"
                                                     isLoading={isSubmitting}
                                                 >
-                                                    Register
+                                                    Ok
                                                 </Button>
                                             </Stack>
                                         </Stack>
@@ -108,10 +106,13 @@ const Register: React.FC<RegisterProps> = ({ }) => {
                         </Form>
                     )}
                 </Formik>
-                );
             </BoxWrapper>
         </>
-    );
-};
+    )
+}
 
-export default Register;
+ChangePassword.getInitialProps = ({ query }) => {
+    return { token: query.token as string };
+}
+
+export default ChangePassword;

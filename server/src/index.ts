@@ -8,7 +8,7 @@ import { buildSchema } from "type-graphql";
 import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 import winston from "winston";
-import redis from "redis";
+import Redis from "ioredis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import morgan from "morgan";
@@ -23,47 +23,20 @@ const main = async () => {
     app.use(
         cors({
             credentials: true,
-            origin: [!process.env.CLIENT_DOMAIN, "https://studio.apollographql.com"],
+            origin: "http://localhost:3000",
+            //origin: "https://studio.apollographql.com",
         })
     );
 
-    app.use(morgan("dev"));
-    const logger = winston.createLogger({
-        level: "info",
-        format: winston.format.json(),
-        defaultMeta: { service: "user-service" },
-        transports: [
-            //
-            // - Write all logs with level `error` and below to `error.log`
-            // - Write all logs with level `info` and below to `combined.log`
-            //
-            new winston.transports.File({
-                filename: "error.log",
-                level: "error",
-            }),
-            new winston.transports.File({ filename: "combined.log" }),
-        ],
-    });
-
-    //
-    // If we're not in production then log to the `console` with the format:
-    // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-    //
-    if (__prod__) {
-        logger.add(
-            new winston.transports.Console({
-                format: winston.format.simple(),
-            })
-        );
-    }
+    app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
     let RedisStore = connectRedis(session);
-    let redisClient = redis.createClient();
+    let redis = new Redis();
 
     app.use(
         session({
             name: COOKIE_NAME,
-            store: new RedisStore({ client: redisClient, disableTouch: true }),
+            store: new RedisStore({ client: redis, disableTouch: true }),
             cookie: {
                 maxAge: 315569520000, // 10 years
                 httpOnly: true,
@@ -85,6 +58,7 @@ const main = async () => {
             em: orm.em,
             req: req,
             res: res,
+            redis: redis
         }),
     });
 
