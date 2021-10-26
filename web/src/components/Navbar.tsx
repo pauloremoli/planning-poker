@@ -21,7 +21,7 @@ export default function Navbar() {
                 <Flex>
                     <Box>
                         <Text fontSize={"lg"} color={"white"} mr={2}>
-                            {data?.me?.username}
+                            ({data?.me?.username})
                         </Text>
                     </Box>
                     <NextLink href="/login">

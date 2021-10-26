@@ -7,7 +7,6 @@ import {
     Button,
     Heading,
     useColorModeValue,
-    Checkbox,
     Link,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
@@ -94,9 +93,6 @@ const Login: React.FC<LoginProps> = ({}) => {
                                                     align={"start"}
                                                     justify={"space-between"}
                                                 >
-                                                    <Checkbox>
-                                                        Remember me
-                                                    </Checkbox>
                                                     <NextLink href="forgot-password">
                                                         <Link
                                                             color={"blue.400"}

@@ -15,9 +15,9 @@ import { toErrorMap } from "../utils/toErrorMap";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
 
-interface RegisterProps { }
+interface RegisterProps {}
 
-const Register: React.FC<RegisterProps> = ({ }) => {
+const Register: React.FC<RegisterProps> = ({}) => {
     const [registerMutation] = useRegisterMutation();
     const router = useRouter();
 
@@ -39,7 +39,6 @@ const Register: React.FC<RegisterProps> = ({ }) => {
                         } else if (response.data?.register.user) {
                             router.push("/");
                         }
-
                     }}
                 >
                     {({ isSubmitting }) => (
@@ -108,7 +107,6 @@ const Register: React.FC<RegisterProps> = ({ }) => {
                         </Form>
                     )}
                 </Formik>
-                );
             </BoxWrapper>
         </>
     );

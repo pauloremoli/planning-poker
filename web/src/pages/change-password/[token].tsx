@@ -10,7 +10,9 @@ import {
     Heading,
     useColorModeValue,
     Text,
+    Link,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 import InputField from "../../components/InputField";
 import BoxWrapper from "../../components/BoxWrapper";
 import { useChangePasswordMutation } from "../../generated/graphql";
@@ -87,9 +89,12 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
                                             />
                                             {tokenError ? (
                                                 <Box>
-                                                    <Text color="red">
+                                                    <Text color="red" mr={4}>
                                                         {tokenError}
                                                     </Text>
+                                                    <NextLink href="/forgot-password">
+                                                        <Link>Click here to get a new one</Link>
+                                                    </NextLink>
                                                 </Box>
                                             ) : null}
                                             <Stack spacing={10}>

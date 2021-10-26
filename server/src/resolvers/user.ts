@@ -210,7 +210,7 @@ export class UserResolver {
                 errors: [
                     {
                         field: "token",
-                        message: "This link is not valid",
+                        message: "This ink is not valid anymore.",
                     },
                 ],
             };
