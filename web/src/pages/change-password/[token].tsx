@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { NextPage } from 'next';
+import React, { useState } from "react";
+import { NextPage } from "next";
 
 import { Form, Formik } from "formik";
 import {
@@ -9,42 +9,43 @@ import {
     Button,
     Heading,
     useColorModeValue,
-    Text
+    Text,
 } from "@chakra-ui/react";
-import NextLink from "next/link";
-import InputField from "../components/InputField";
-import BoxWrapper from "../components/BoxWrapper";
-import { useChangePasswordMutation } from "../generated/graphql";
-import { toErrorMap } from "../utils/toErrorMap";
+import InputField from "../../components/InputField";
+import BoxWrapper from "../../components/BoxWrapper";
+import { useChangePasswordMutation } from "../../generated/graphql";
+import { toErrorMap } from "../../utils/toErrorMap";
 import { useRouter } from "next/router";
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
 
 const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
-
     const [ChangePasswordMutation] = useChangePasswordMutation();
     const router = useRouter();
-    const [tokenError, setTokenError] = useState("")
-
+    const [tokenError, setTokenError] = useState("");
 
     return (
         <>
             <Navbar />
             <BoxWrapper>
                 <Formik
-                    initialValues={{ password: "" }}
+                    initialValues={{ newPassword: "" }}
                     onSubmit={async (values, { setErrors }) => {
                         const response = await ChangePasswordMutation({
                             variables: { token, ...values },
                         });
 
+                        console.log(response.data?.changePassword);
+
                         if (response.data?.changePassword.errors) {
-                            const errorMap = toErrorMap(response.data?.login.errors)
+                            const errorMap = toErrorMap(
+                                response.data?.changePassword.errors
+                            );
                             setErrors(errorMap);
-                            if ('token' in errorMap) {
+                            if ("token" in errorMap) {
                                 setTokenError(errorMap.token);
                             }
-                        } else if (response.data?.login.user) {
-                            router.push("/login");
+                        } else if (response.data?.changePassword.user) {
+                            router.push("/");
                         }
                     }}
                 >
@@ -80,13 +81,18 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
                                         <Stack spacing={4}>
                                             <InputField
                                                 label="New password"
-                                                name="password"
+                                                name="newPassword"
                                                 placeholder="password"
                                                 type="password"
                                             />
-                                            {tokenError ? <Box><Text color="red">{tokenError}</Text></Box> : null}
+                                            {tokenError ? (
+                                                <Box>
+                                                    <Text color="red">
+                                                        {tokenError}
+                                                    </Text>
+                                                </Box>
+                                            ) : null}
                                             <Stack spacing={10}>
-
                                                 <Button
                                                     bg={"blue.400"}
                                                     color={"white"}
@@ -108,11 +114,11 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
                 </Formik>
             </BoxWrapper>
         </>
-    )
-}
+    );
+};
 
 ChangePassword.getInitialProps = ({ query }) => {
     return { token: query.token as string };
-}
+};
 
 export default ChangePassword;

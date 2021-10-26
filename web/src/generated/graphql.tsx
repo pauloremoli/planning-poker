@@ -25,7 +25,7 @@ export type Mutation = {
   changePassword: UserResponse;
   createPost: Post;
   deletePost: Scalars['Boolean'];
-  forgotPassword: Scalars['Boolean'];
+  forgotPassword: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
   register: UserResponse;
@@ -34,7 +34,7 @@ export type Mutation = {
 
 
 export type MutationChangePasswordArgs = {
-  password: Scalars['String'];
+  newPassword: Scalars['String'];
   token: Scalars['String'];
 };
 
@@ -115,16 +115,18 @@ export type UserResponseFragmentFragment = { __typename?: 'UserResponse', user?:
 
 export type ChangePasswordMutationVariables = Exact<{
   token: Scalars['String'];
-  password: Scalars['String'];
+  newPassword: Scalars['String'];
 }>;
 
 
 export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
 
-export type ForgotPasswordMutationVariables = Exact<{ [key: string]: never; }>;
+export type ForgotPasswordMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
 
 
-export type ForgotPasswordMutation = { __typename?: 'Mutation', logout: boolean };
+export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
 
 export type LoginMutationVariables = Exact<{
   password: Scalars['String'];
@@ -182,12 +184,18 @@ export const UserResponseFragmentFragmentDoc = gql`
     ${UserFragmentFragmentDoc}
 ${ErrorFragmentFragmentDoc}`;
 export const ChangePasswordDocument = gql`
-    mutation ChangePassword($token: String!, $password: String!) {
-  changePassword(token: $token, password: $password) {
-    ...UserResponseFragment
+    mutation ChangePassword($token: String!, $newPassword: String!) {
+  changePassword(token: $token, newPassword: $newPassword) {
+    user {
+      ...UserFragment
+    }
+    errors {
+      ...ErrorFragment
+    }
   }
 }
-    ${UserResponseFragmentFragmentDoc}`;
+    ${UserFragmentFragmentDoc}
+${ErrorFragmentFragmentDoc}`;
 export type ChangePasswordMutationFn = Apollo.MutationFunction<ChangePasswordMutation, ChangePasswordMutationVariables>;
 
 /**
@@ -204,7 +212,7 @@ export type ChangePasswordMutationFn = Apollo.MutationFunction<ChangePasswordMut
  * const [changePasswordMutation, { data, loading, error }] = useChangePasswordMutation({
  *   variables: {
  *      token: // value for 'token'
- *      password: // value for 'password'
+ *      newPassword: // value for 'newPassword'
  *   },
  * });
  */
@@ -216,10 +224,12 @@ export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswo
 export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
 export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
 export const ForgotPasswordDocument = gql`
-    mutation ForgotPassword {
-  logout
+    mutation ForgotPassword($email: String!) {
+  forgotPassword(email: $email) {
+    ...UserResponseFragment
+  }
 }
-    `;
+    ${UserResponseFragmentFragmentDoc}`;
 export type ForgotPasswordMutationFn = Apollo.MutationFunction<ForgotPasswordMutation, ForgotPasswordMutationVariables>;
 
 /**
@@ -235,6 +245,7 @@ export type ForgotPasswordMutationFn = Apollo.MutationFunction<ForgotPasswordMut
  * @example
  * const [forgotPasswordMutation, { data, loading, error }] = useForgotPasswordMutation({
  *   variables: {
+ *      email: // value for 'email'
  *   },
  * });
  */

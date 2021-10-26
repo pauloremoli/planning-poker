@@ -14,6 +14,7 @@ import BoxWrapper from "../components/BoxWrapper";
 import { useRouter } from "next/router";
 import Navbar from "../components/Navbar";
 import { useForgotPasswordMutation } from "../generated/graphql";
+import { toErrorMap } from "../utils/toErrorMap";
 
 interface ForgotPasswordProps {}
 
@@ -28,9 +29,16 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
                 <Formik
                     initialValues={{ email: "" }}
                     onSubmit={async (values, { setErrors }) => {
-                        const res = await ForgotPasswordMutation();
-                        console.log(res);
-                        router.push("/login");
+                        const response = await ForgotPasswordMutation({
+                            variables: { ...values },
+                        });
+                        if (response.data?.forgotPassword.errors) {
+                            setErrors(
+                                toErrorMap(response.data?.forgotPassword.errors)
+                            );
+                        } else if (response.data?.forgotPassword.user) {
+                            router.push("/login");
+                        }
                     }}
                 >
                     {({ isSubmitting }) => (
