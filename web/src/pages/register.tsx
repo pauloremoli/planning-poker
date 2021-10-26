@@ -26,7 +26,7 @@ const Register: React.FC<RegisterProps> = ({}) => {
             <Navbar />
             <BoxWrapper>
                 <Formik
-                    initialValues={{ username: "", password: "", email: "" }}
+                    initialValues={{ username: "", password: "", email: "", avatar : "" }}
                     onSubmit={async (values, { setErrors }) => {
                         const response = await registerMutation({
                             variables: { ...values },
@@ -86,6 +86,11 @@ const Register: React.FC<RegisterProps> = ({}) => {
                                                 name="password"
                                                 placeholder="password"
                                                 type="password"
+                                            />
+                                            <InputField
+                                                label="Avatar"
+                                                name="avatar"
+                                                placeholder="link to an image"
                                             />
                                             <Stack spacing={10}>
                                                 <Button

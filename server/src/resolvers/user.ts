@@ -48,6 +48,7 @@ export class UserResolver {
         @Arg("username") username: string,
         @Arg("password") password: string,
         @Arg("email") email: string,
+        @Arg("avatar") avatar: string,
         @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
         if (username.length <= 2) {
@@ -76,6 +77,7 @@ export class UserResolver {
             username: username,
             password: hashedPassword,
             email: email,
+            avatar: avatar
         });
         try {
             await em.persistAndFlush(user);

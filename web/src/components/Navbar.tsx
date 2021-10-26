@@ -1,9 +1,40 @@
-import { Box, Button, Flex, Link, Stack, Text } from "@chakra-ui/react";
-import React from "react";
+import React, { ReactNode } from "react";
 import NextLink from "next/link";
-import { useColorModeValue } from "@chakra-ui/react";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { useApolloClient } from "@apollo/client";
+import {
+    Box,
+    Flex,
+    Link,
+    Button,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuDivider,
+    useDisclosure,
+    useColorModeValue,
+    Stack,
+    useColorMode,
+    Center,
+    Text,
+} from "@chakra-ui/react";
+import CustomAvatar from "./CustomAvatar";
+
+const NavLink = ({ children }: { children: ReactNode }) => (
+    <Link
+        px={2}
+        py={1}
+        rounded={"md"}
+        _hover={{
+            textDecoration: "none",
+            bg: useColorModeValue("gray.200", "gray.700"),
+        }}
+        href={"#"}
+    >
+        {children}
+    </Link>
+);
 
 export default function Navbar() {
     const [logout, { loading: logoutFetching }] = useLogoutMutation();
@@ -11,37 +42,63 @@ export default function Navbar() {
 
     const { data } = useMeQuery();
 
-    let body = null;
+    let menuItems = null;
 
     if (data?.me) {
         console.log(data);
 
-        body = (
+        menuItems = (
             <>
-                <Flex>
-                    <Box>
-                        <Text fontSize={"lg"} color={"white"} mr={2}>
-                            ({data?.me?.username})
-                        </Text>
-                    </Box>
-                    <NextLink href="/login">
-                        <Button
-                            onClick={() => {
-                                logout();
-                                apolloClient.resetStore();
-                            }}
-                            isLoading={logoutFetching}
-                            variant="link"
-                            color={"white"}
-                        >
-                            Log out
-                        </Button>
-                    </NextLink>
+                <Flex alignItems={"center"}>
+                    <Stack direction={"row"} spacing={7}>
+                        <Menu>
+                            <MenuButton
+                                as={Button}
+                                rounded={"full"}
+                                variant={"link"}
+                                cursor={"pointer"}
+                                minW={0}
+                            >
+                                <CustomAvatar
+                                    size="sm"
+                                    url={data?.me?.avatar}
+                                />
+                            </MenuButton>
+                            <MenuList alignItems={"center"}>
+                                <br />
+                                <Center>
+                                    <CustomAvatar
+                                        size="2xl"
+                                        url={data?.me?.avatar}
+                                    />
+                                </Center>
+                                <br />
+                                <Center>
+                                    <p>{data?.me?.username}</p>
+                                </Center>
+                                <br />
+                                <MenuDivider />
+                                <NextLink href="/profile">
+                                <MenuItem>Edit profile</MenuItem>
+                                </NextLink>
+                                <NextLink href="/login">
+                                    <MenuItem
+                                        onClick={() => {
+                                            logout();
+                                            apolloClient.resetStore();
+                                        }}
+                                    >
+                                        Log out
+                                    </MenuItem>
+                                </NextLink>
+                            </MenuList>
+                        </Menu>
+                    </Stack>
                 </Flex>
             </>
         );
     } else {
-        body = (
+        menuItems = (
             <>
                 <Flex>
                     <NextLink href="/login">
@@ -54,14 +111,19 @@ export default function Navbar() {
             </>
         );
     }
+
     return (
-        <Flex
-            bg="blue"
-            p={4}
-            bg={useColorModeValue("blue.400", "gray.800")}
-            color={useColorModeValue("white", "white")}
-        >
-            <Box ml={"auto"}>{body}</Box>
-        </Flex>
+        <>
+            <Box bg={useColorModeValue("gray.100", "gray.900")} px={4}>
+                <Flex
+                    h={16}
+                    alignItems={"center"}
+                    justifyContent={"space-between"}
+                >
+                    <Box>Logo</Box>
+                    {menuItems}
+                </Flex>
+            </Box>
+        </>
     );
 }

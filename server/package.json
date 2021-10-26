@@ -35,6 +35,7 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
     "@mikro-orm/cli": "^4.5.9",
     "@mikro-orm/core": "^4.5.9",
     "@mikro-orm/migrations": "^4.5.9",
