@@ -5,8 +5,10 @@ import {
     Column,
     CreateDateColumn,
     Entity,
+    JoinColumn,
     JoinTable,
     ManyToMany,
+    OneToOne,
     PrimaryGeneratedColumn,
 } from "typeorm";
 import { User } from "./User";
@@ -27,7 +29,8 @@ export class Order extends BaseEntity {
     id!: number;
 
     @Field()
-    @Column({ unique: true })
+    @OneToOne(() => User)
+    @JoinColumn()
     user!: User;
 
     @ManyToMany(() => Product)

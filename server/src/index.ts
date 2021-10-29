@@ -1,3 +1,5 @@
+import { Order } from './entities/Order';
+import { Product } from './entities/Product';
 import "reflect-metadata";
 import { __prod__, COOKIE_NAME } from "./constants";
 import express from "express";
@@ -13,6 +15,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { createConnection } from "typeorm";
 import { User } from "./entities/User";
+import { Category } from "./entities/Category";
 
 require("dotenv-safe").config();
 
@@ -24,7 +27,7 @@ const main = async () => {
         password: 'postgres',
         logging: true,
         synchronize: true,
-        entities: [User],
+        entities: [User, Category, Product, Order],
     })
     const app = express();
 

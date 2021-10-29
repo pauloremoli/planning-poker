@@ -25,14 +25,14 @@ export class Product extends BaseEntity {
     @Column({ unique: true })
     description!: string;
 
-    @Field()
+    @Field(() => Category)
     @ManyToMany(() => Category)
     @JoinTable()
     category!: Category[];
 
-    @Field()
+    @Field(() => [String])
     @Column("simple-array")
-    photos: string[];
+    photos!: string[];
 
     @Field()
     @Column()
