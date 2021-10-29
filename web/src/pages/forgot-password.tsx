@@ -72,11 +72,10 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
                                     >
                                         <Stack align={"center"}>
                                             <Heading fontSize={"4xl"}>
-                                                Forgot password
+                                                Forgot your password?
                                             </Heading>
                                             <Text>
-                                                You will receive an email with
-                                                link to change the password
+                                                You'll get an email with a reset link
                                             </Text>
                                         </Stack>
                                         <Box
@@ -104,7 +103,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({}) => {
                                                         type="submit"
                                                         isLoading={isSubmitting}
                                                     >
-                                                        Forgot password
+                                                        Request reset
                                                     </Button>
                                                 </Stack>
                                             </Stack>

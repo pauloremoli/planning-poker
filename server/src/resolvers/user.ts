@@ -80,7 +80,7 @@ export class UserResolver {
             avatar: avatar
         });
         try {
-            await em.persistAndFlush(user);
+            await em.save(user);
         } catch (err) {
             console.log(err.details);
 
@@ -242,7 +242,7 @@ export class UserResolver {
         }
 
         user.password = await argon2.hash(newPassword);
-        em.persistAndFlush(user);
+        em.save(user);
 
         await redis.del(FORGET_PASSWORD_PREFIX + token);
 

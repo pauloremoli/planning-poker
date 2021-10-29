@@ -8,7 +8,7 @@ interface BoxWrapperProps {
 const BoxWrapper: React.FC<BoxWrapperProps> = ({ children, size = 'medium' }) => {
     return (
         <Box
-            mt={8} mx="auto" maxW={size === "medium" ? "800px" : "400px"}>
+            mx="auto" maxW={size === "medium" ? "1024px" : "400px"}>
             {children}
         </Box>
     )

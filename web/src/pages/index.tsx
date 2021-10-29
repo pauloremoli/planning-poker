@@ -8,27 +8,13 @@ import { usePostsQuery } from "../generated/graphql";
 interface IndexProps { }
 
 const Index: React.FC<IndexProps> = ({ }) => {
-    const { data } = usePostsQuery({
-    });
 
     return (
         <>
             <Navbar />
             <BoxWrapper>
                 <Box>
-                    {!data?.posts ?
-                        (
-                            <Box>
-                                <Text>No posts to show...</Text>
-                            </Box>
-                        ) :
-                        (
-                            data?.posts.map((post) => (
-                                <Box key={post.id}>
-                                    <Text ml={2}>{post.title}</Text>
-                                </Box>
-                            ))
-                        )}
+                    hello there
                 </Box>
             </BoxWrapper>
         </>

@@ -1,22 +1,31 @@
 import "reflect-metadata";
 import { __prod__, COOKIE_NAME } from "./constants";
-import { MikroORM } from "@mikro-orm/core";
-import mikroConfig from "./mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
-import { PostResolver } from "./resolvers/post";
 import { UserResolver } from "./resolvers/user";
 import Redis from "ioredis";
 import session from "express-session";
 import connectRedis from "connect-redis";
 import morgan from "morgan";
 import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { createConnection } from "typeorm";
+import { User } from "./entities/User";
 
 require("dotenv-safe").config();
 
 const main = async () => {
-    const orm = await MikroORM.init(mikroConfig);
+    const conn = await createConnection({
+        type: 'postgres',
+        database: 'sonhoencantado',
+        username: 'postgres',
+        password: 'postgres',
+        logging: true,
+        synchronize: true,
+        entities: [User],
+    })
     const app = express();
 
     app.use(
@@ -27,7 +36,9 @@ const main = async () => {
         })
     );
 
-    app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
+    app.use(
+        morgan(":method :url :status :res[content-length] - :response-time ms")
+    );
 
     let RedisStore = connectRedis(session);
     let redis = new Redis();
@@ -50,14 +61,14 @@ const main = async () => {
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [PostResolver, UserResolver],
+            resolvers: [UserResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({
-            em: orm.em,
+            em: conn.createEntityManager(),
             req: req,
             res: res,
-            redis: redis
+            redis: redis,
         }),
     });
 
@@ -65,6 +76,31 @@ const main = async () => {
     apolloServer.applyMiddleware({
         app,
         cors: false,
+    });
+
+    const httpServer = createServer(app);
+    const io = new Server(httpServer, {
+        cors: {
+            origin: "http://localhost:3000",
+            methods: ["GET", "POST"],
+        },
+    });
+
+    io.on("connection", (socket) => {
+        console.log(`User Connected: ${socket.id}`);
+
+        socket.on("join_room", (data) => {
+            socket.join(data);
+            console.log(`User with ID: ${socket.id} joined room: ${data}`);
+        });
+
+        socket.on("send_message", (data) => {
+            socket.to(data.room).emit("receive_message", data);
+        });
+
+        socket.on("disconnect", () => {
+            console.log("User Disconnected", socket.id);
+        });
     });
 
     const port = process.env.PORT;
