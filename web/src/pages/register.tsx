@@ -7,7 +7,9 @@ import {
     Button,
     Heading,
     useColorModeValue,
+    Link,
 } from "@chakra-ui/react";
+import NextLink from "next/link";
 import InputField from "../components/InputField";
 import BoxWrapper from "../components/BoxWrapper";
 import { useRegisterMutation } from "../generated/graphql";
@@ -26,7 +28,12 @@ const Register: React.FC<RegisterProps> = ({}) => {
             <Navbar />
             <BoxWrapper>
                 <Formik
-                    initialValues={{ username: "", password: "", email: "", avatar : "" }}
+                    initialValues={{
+                        username: "",
+                        password: "",
+                        email: "",
+                        avatar: "",
+                    }}
                     onSubmit={async (values, { setErrors }) => {
                         const response = await registerMutation({
                             variables: { ...values },
@@ -104,6 +111,18 @@ const Register: React.FC<RegisterProps> = ({}) => {
                                                 >
                                                     Register
                                                 </Button>
+
+                                                <Box>
+                                                    Already have an account?
+                                                    <NextLink href="/login">
+                                                        <Link
+                                                            color={"blue.400"}
+                                                            ml={2}
+                                                        >
+                                                            Log in
+                                                        </Link>
+                                                    </NextLink>
+                                                </Box>
                                             </Stack>
                                         </Stack>
                                     </Box>

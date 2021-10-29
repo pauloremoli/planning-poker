@@ -96,6 +96,7 @@ const Login: React.FC<LoginProps> = ({}) => {
                                                     <NextLink href="forgot-password">
                                                         <Link
                                                             color={"blue.400"}
+                                                            ml="auto"
                                                         >
                                                             Forgot password?
                                                         </Link>
@@ -112,6 +113,17 @@ const Login: React.FC<LoginProps> = ({}) => {
                                                 >
                                                     Login
                                                 </Button>
+                                                <Box>
+                                                    Don't have an account yet?
+                                                    <NextLink href="/register">
+                                                        <Link
+                                                            color={"blue.400"}
+                                                            ml={2}
+                                                        >
+                                                            Sign up
+                                                        </Link>
+                                                    </NextLink>
+                                                </Box>
                                             </Stack>
                                         </Stack>
                                     </Box>
