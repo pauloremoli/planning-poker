@@ -4,8 +4,7 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    JoinTable,
-    ManyToMany,
+    ManyToOne,
     PrimaryGeneratedColumn,
 } from "typeorm";
 import { Category } from "./Category";
@@ -25,12 +24,14 @@ export class Product extends BaseEntity {
     @Column({ unique: true })
     description!: string;
 
-    @Field(() => Category)
-    @ManyToMany(() => Category)
-    @JoinTable()
-    category!: Category[];
+    @Field()
+    @Column()
+    categoryId!: number;
 
-    @Field(() => [String])
+    @ManyToOne(() => Category, category => category.products)
+    category!: Category;
+
+    @Field(() => [String!])
     @Column("simple-array")
     photos!: string[];
 

@@ -18,6 +18,19 @@ export enum IdType {
     PASSPORT = "passport",
 }
 
+// export const userSchema = Joi.object().keys({
+//     username: Joi.string().alphanum().min(3).max(30).required(),
+//     mail: Joi.string().email().required(),
+//     password: Joi.string().min(6).required(),
+//     phone: Joi.string().min(8).required(),
+//     city: Joi.string().required(),
+//     address: Joi.string().required(),
+//     state: Joi.string().required(),
+//     zipCode: Joi.string().required().pattern(new RegExp('/^[0-9]{8}$/')),
+//     identification: Joi.string().required(),        
+//     idType: Joi.string().required(),
+// });
+
 @ObjectType()
 @Entity()
 export class User extends BaseEntity {

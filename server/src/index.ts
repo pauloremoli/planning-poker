@@ -1,3 +1,5 @@
+import { ProductResolver } from './resolvers/product';
+import { CategoryResolver } from './resolvers/category';
 import { Order } from './entities/Order';
 import { Product } from './entities/Product';
 import "reflect-metadata";
@@ -34,8 +36,8 @@ const main = async () => {
     app.use(
         cors({
             credentials: true,
-            origin: "http://localhost:3000",
-            //origin: "https://studio.apollographql.com",
+            //origin: "http://localhost:3000",
+            origin: "https://studio.apollographql.com",
         })
     );
 
@@ -64,7 +66,7 @@ const main = async () => {
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [UserResolver],
+            resolvers: [UserResolver, CategoryResolver, ProductResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({
