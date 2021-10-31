@@ -11,7 +11,6 @@ import {
 import { MyContext } from "../types";
 import { Product } from "../entities/Product";
 import { FieldError } from "./FieldError";
-import e from "express";
 
 @ObjectType()
 class ProductResponse {
@@ -26,8 +25,7 @@ class ProductResponse {
 export class ProductResolver {
     @Query(() => [Product], { nullable: true })
     async products(@Ctx() { em }: MyContext) {
-        const products = await em.find(Product, {});
-        console.log(products);
+        const products = await em.find(Product, {relations: ["category"]});
         return products;
     }
 
@@ -35,7 +33,17 @@ export class ProductResolver {
     async product(@Arg("id") id: number, @Ctx() { em }: MyContext) {
         const product = await em.findOne(Product, { id });
 
-        console.log(product);
+        if (!product) {
+            return {
+                errors: [
+                    {
+                        field: "id",
+                        message: "Product doesn't exists",
+                    },
+                ],
+            };
+        }
+        
         return product;
     }
 
@@ -64,7 +72,7 @@ export class ProductResolver {
         const product = em.create(Product, {
             name: name,
             description: description,
-            categoryId: categoryId,
+            category: category,
             photos: photos,
             price: price,
             stock: stock,
@@ -123,7 +131,7 @@ export class ProductResolver {
             };
         }
 
-        const category = em.findOne(Category, { id: categoryId });
+        const category = await em.findOne(Category, { id: categoryId });
         if (!category) {
             return {
                 errors: [
@@ -137,13 +145,12 @@ export class ProductResolver {
 
         product.name = name;
         product.description = description;
-        product.categoryId = categoryId;
+        product.category = category;
         product.photos = photos;
         product.price = price;
         product.stock = stock;
 
         try {
-            ``;
             await em.save(product);
         } catch (err) {
             console.log(err.details);
@@ -198,4 +205,5 @@ export class ProductResolver {
         product.id = id;
         return { product };
     }
+
 }

@@ -1,3 +1,4 @@
+import { ProductDetails } from './ProductDetails';
 import { Field, Int, ObjectType } from "type-graphql";
 import {
     BaseEntity,
@@ -5,6 +6,7 @@ import {
     CreateDateColumn,
     Entity,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
 } from "typeorm";
 import { Category } from "./Category";
@@ -25,11 +27,11 @@ export class Product extends BaseEntity {
     description!: string;
 
     @Field()
-    @Column()
-    categoryId!: number;
-
     @ManyToOne(() => Category, category => category.products)
     category!: Category;
+
+    @OneToMany(() => ProductDetails, pd => pd.order)
+    orderConnection: Promise<ProductDetails[]>;
 
     @Field(() => [String!])
     @Column("simple-array")

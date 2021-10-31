@@ -1,13 +1,14 @@
+import { MyContext } from './../types';
+import { ProductDetails } from './ProductDetails';
 import { Product } from "./Product";
-import { Field, Int, ObjectType } from "type-graphql";
+import { Ctx, Field, Int, ObjectType } from "type-graphql";
 import {
     BaseEntity,
     Column,
     CreateDateColumn,
     Entity,
     JoinColumn,
-    JoinTable,
-    ManyToMany,
+    OneToMany,
     OneToOne,
     PrimaryGeneratedColumn,
 } from "typeorm";
@@ -33,17 +34,18 @@ export class Order extends BaseEntity {
     @JoinColumn()
     user!: User;
 
-    @ManyToMany(() => Product)
-    @JoinTable()
-    products!: Product;
+    @Field(() => [ProductDetails])
+    @OneToMany(() => ProductDetails, pd => pd.order)
+    productConnection: Promise<ProductDetails[]>;
+
+    @Field(() => [Product])
+    async products(@Ctx() { productsLoader }: MyContext): Promise<Product[]> {
+        return productsLoader.load(this.id);
+    }
 
     @Field()
     @Column()
     rentalDate: Date;
-
-    @Field()
-    @Column()
-    type: string;
 
     @Field()
     @Column({
@@ -55,7 +57,7 @@ export class Order extends BaseEntity {
 
     @Field()
     @Column()
-    ammount: number;
+    amount: number;
 
     @Field(() => String)
     @Column()

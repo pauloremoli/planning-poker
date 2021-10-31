@@ -1,3 +1,5 @@
+import { OrderResolver } from './resolvers/order';
+import { ProductDetails } from './entities/ProductDetails';
 import { ProductResolver } from './resolvers/product';
 import { CategoryResolver } from './resolvers/category';
 import { Order } from './entities/Order';
@@ -18,6 +20,7 @@ import { Server } from "socket.io";
 import { createConnection } from "typeorm";
 import { User } from "./entities/User";
 import { Category } from "./entities/Category";
+import {createProductsLoader} from "./utils/productsLoader";
 
 require("dotenv-safe").config();
 
@@ -29,7 +32,7 @@ const main = async () => {
         password: 'postgres',
         logging: true,
         synchronize: true,
-        entities: [User, Category, Product, Order],
+        entities: [User, Category, Product, Order, ProductDetails],
     })
     const app = express();
 
@@ -66,7 +69,7 @@ const main = async () => {
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [UserResolver, CategoryResolver, ProductResolver],
+            resolvers: [UserResolver, CategoryResolver, ProductResolver, OrderResolver],
             validate: false,
         }),
         context: ({ req, res }) => ({
@@ -74,6 +77,7 @@ const main = async () => {
             req: req,
             res: res,
             redis: redis,
+            productLoaders: createProductsLoader()
         }),
     });
 

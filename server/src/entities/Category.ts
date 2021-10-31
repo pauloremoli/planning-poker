@@ -1,5 +1,5 @@
 import { Field, Int, ObjectType } from "type-graphql";
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Product } from "./Product";
 
 @ObjectType()
@@ -14,5 +14,6 @@ export class Category extends BaseEntity {
     name!: string;
 
     @OneToMany(() => Product, product => product.category)
+    @JoinColumn({ name: "categoryId" })
     products: Product[];
 }
