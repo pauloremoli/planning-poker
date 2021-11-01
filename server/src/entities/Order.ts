@@ -1,7 +1,4 @@
-import { MyContext } from './../types';
-import { ProductDetails } from './ProductDetails';
-import { Product } from "./Product";
-import { Ctx, Field, Int, ObjectType } from "type-graphql";
+import { Field, ObjectType } from "type-graphql";
 import {
     BaseEntity,
     Column,
@@ -10,10 +7,12 @@ import {
     JoinColumn,
     OneToMany,
     OneToOne,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn
 } from "typeorm";
+import { ProductDetails } from './ProductDetails';
 import { User } from "./User";
 
+@ObjectType()
 export enum OrderStatus {
     PENDING = "pending",
     APPROVED = "approved",
@@ -25,23 +24,18 @@ export enum OrderStatus {
 @ObjectType()
 @Entity()
 export class Order extends BaseEntity {
-    @Field(() => Int)
+    @Field()
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Field()
+    @Field(() => User)
     @OneToOne(() => User)
     @JoinColumn()
     user!: User;
 
     @Field(() => [ProductDetails])
     @OneToMany(() => ProductDetails, pd => pd.order)
-    productConnection: Promise<ProductDetails[]>;
-
-    @Field(() => [Product])
-    async products(@Ctx() { productsLoader }: MyContext): Promise<Product[]> {
-        return productsLoader.load(this.id);
-    }
+    products: Promise<ProductDetails[]>;
 
     @Field()
     @Column()

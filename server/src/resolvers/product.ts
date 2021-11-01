@@ -25,12 +25,15 @@ class ProductResponse {
 export class ProductResolver {
     @Query(() => [Product], { nullable: true })
     async products(@Ctx() { em }: MyContext) {
-        const products = await em.find(Product, {relations: ["category"]});
+        const products = await em.find(Product, { relations: ["category"] });
         return products;
     }
 
-    @Query(() => Product, { nullable: true })
-    async product(@Arg("id") id: number, @Ctx() { em }: MyContext) {
+    @Query(() => ProductResponse, { nullable: true })
+    async product(
+        @Arg("id") id: number,
+        @Ctx() { em }: MyContext
+    ): Promise<ProductResponse> {
         const product = await em.findOne(Product, { id });
 
         if (!product) {
@@ -43,8 +46,8 @@ export class ProductResolver {
                 ],
             };
         }
-        
-        return product;
+
+        return { product };
     }
 
     @Mutation(() => ProductResponse)
@@ -205,5 +208,4 @@ export class ProductResolver {
         product.id = id;
         return { product };
     }
-
 }

@@ -7,14 +7,22 @@ import {
     ObjectType,
     Query,
 } from "type-graphql";
-import { User } from "../entities/User";
+import { IdType, User, UserRole } from "../entities/User";
 import { MyContext } from "../types";
 import argon2 from "argon2";
 import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from "../constants";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
 import { FieldError } from "./FieldError";
+import { registerEnumType } from "type-graphql";
 
+registerEnumType(UserRole, {
+    name: "UserRole",
+});
+
+registerEnumType(IdType, {
+    name: "IdType",
+});
 
 @ObjectType()
 class UserResponse {
@@ -37,12 +45,25 @@ export class UserResolver {
         return user;
     }
 
+    @Query(() => [User], { nullable: true })
+    async users(@Ctx() { em }: MyContext) {
+        return await em.find(User, {});
+    }
+
     @Mutation(() => UserResponse)
     async register(
         @Arg("username") username: string,
         @Arg("password") password: string,
         @Arg("email") email: string,
         @Arg("avatar") avatar: string,
+        @Arg("phone") phone: string,
+        @Arg("address") address: string,
+        @Arg("city") city: string,
+        @Arg("state") state: string,
+        @Arg("zipCode") zipCode: string,
+        @Arg("identification") identification: string,
+        @Arg("idType", () => IdType) idType: IdType,
+        @Arg("userRole", () => UserRole) userRole: UserRole,
         @Ctx() { em, req }: MyContext
     ): Promise<UserResponse> {
         if (username.length <= 2) {
@@ -71,7 +92,15 @@ export class UserResolver {
             username: username,
             password: hashedPassword,
             email: email,
-            avatar: avatar
+            avatar: avatar,
+            phone: phone,
+            address: address,
+            zipCode: zipCode,
+            city: city,
+            state: state,
+            identification: identification,
+            idType: idType,
+            userRole: userRole,
         });
         try {
             await em.save(user);
@@ -199,7 +228,6 @@ export class UserResolver {
         @Arg("newPassword") newPassword: string,
         @Ctx() { req, em, redis }: MyContext
     ): Promise<UserResponse> {
-
         const userId = await redis.get(FORGET_PASSWORD_PREFIX + token);
         if (!userId) {
             return {

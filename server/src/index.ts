@@ -1,9 +1,9 @@
-import { OrderResolver } from './resolvers/order';
-import { ProductDetails } from './entities/ProductDetails';
-import { ProductResolver } from './resolvers/product';
-import { CategoryResolver } from './resolvers/category';
-import { Order } from './entities/Order';
-import { Product } from './entities/Product';
+import { OrderResolver } from "./resolvers/order";
+import { ProductDetails } from "./entities/ProductDetails";
+import { ProductResolver } from "./resolvers/product";
+import { CategoryResolver } from "./resolvers/category";
+import { Order } from "./entities/Order";
+import { Product } from "./entities/Product";
 import "reflect-metadata";
 import { __prod__, COOKIE_NAME } from "./constants";
 import express from "express";
@@ -17,23 +17,24 @@ import morgan from "morgan";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { createConnection } from "typeorm";
+import { createConnection, getConnection } from "typeorm";
 import { User } from "./entities/User";
 import { Category } from "./entities/Category";
-import {createProductsLoader} from "./utils/productsLoader";
+import { createProductsLoader } from "./utils/productsLoader";
+import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
 
 require("dotenv-safe").config();
 
 const main = async () => {
     const conn = await createConnection({
-        type: 'postgres',
-        database: 'sonhoencantado',
-        username: 'postgres',
-        password: 'postgres',
+        type: "postgres",
+        database: "sonhoencantado",
+        username: "postgres",
+        password: "postgres",
         logging: true,
         synchronize: true,
         entities: [User, Category, Product, Order, ProductDetails],
-    })
+    });
     const app = express();
 
     app.use(
@@ -69,7 +70,12 @@ const main = async () => {
 
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [UserResolver, CategoryResolver, ProductResolver, OrderResolver],
+            resolvers: [
+                UserResolver,
+                CategoryResolver,
+                ProductResolver,
+                OrderResolver,
+            ],
             validate: false,
         }),
         context: ({ req, res }) => ({
@@ -77,8 +83,13 @@ const main = async () => {
             req: req,
             res: res,
             redis: redis,
-            productLoaders: createProductsLoader()
+            productsLoader: createProductsLoader(),
         }),
+        plugins: [
+            ApolloServerLoaderPlugin({
+                typeormGetConnection: getConnection, // for use with TypeORM
+            }),
+        ],
     });
 
     await apolloServer.start();

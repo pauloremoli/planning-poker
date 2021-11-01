@@ -20,13 +20,15 @@ export class ProductDetails extends BaseEntity {
     @PrimaryColumn()
     orderId: number;
 
+    @Field(() => Product)
     @ManyToOne(() => Product, (product) => product.orderConnection, {
         primary: true,
     })
     @JoinColumn({ name: "productId" })
     product: Promise<Product>;
 
-    @ManyToOne(() => Order, (order) => order.productConnection, {
+    @Field(() => Order)
+    @ManyToOne(() => Order, (order) => order.products, {
         primary: true,
     })
     @JoinColumn({ name: "orderId" })

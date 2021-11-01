@@ -8,12 +8,17 @@ import {
     ObjectType,
     Query,
     InputType,
+    registerEnumType,
 } from "type-graphql";
 import { MyContext } from "../types";
-import { Order } from "../entities/Order";
+import { Order, OrderStatus } from "../entities/Order";
 import { User } from "../entities/User";
 import { FieldError } from "./FieldError";
 import { Product } from "../entities/Product";
+
+registerEnumType(OrderStatus, {
+    name: "OrderStatus",
+});
 
 @ObjectType()
 class OrderResponse {
@@ -26,10 +31,11 @@ class OrderResponse {
 
 @InputType()
 class ProductDetailsInput {
+    @Field()
     productId!: number;
+    @Field()
     size!: string;
 }
-
 
 @ObjectType()
 class ProductDetailsResponse {
@@ -43,16 +49,18 @@ class ProductDetailsResponse {
 @Resolver()
 export class OrderResolver {
     @Query(() => [Order], { nullable: true })
-    async orders(@Ctx() { em }: MyContext) {
-        return await em.find(Order, {relations: ["user", "productDetails"]});
+    async orders(@Ctx() { em }: MyContext): Promise<Order[]> {
+        return await em.find(Order, { relations: ["user", "products"] });
     }
 
-    @Query(() => Order, { nullable: true })
-    async order(@Arg("id") id: number, @Ctx() { em }: MyContext) {
-        const orderRepo = em.getRepository(Order);
-        const order = orderRepo.find({
+    @Query(() => OrderResponse)
+    async order(
+        @Arg("id") id: number,
+        @Ctx() { em }: MyContext
+    ): Promise<OrderResponse> {
+        const order = await em.find(Order, {
             where: { id },
-            relations: ["product", "user"],
+            relations: ["user", "products"],
         });
 
         if (!order) {
@@ -65,7 +73,8 @@ export class OrderResolver {
                 ],
             };
         }
-        return order;
+        console.log(order);
+        return { order };
     }
 
     @Mutation(() => OrderResponse)
@@ -73,7 +82,8 @@ export class OrderResolver {
         @Arg("userId") userId: number,
         @Arg("amount") amount: number,
         @Arg("rentalDate") rentalDate: Date,
-        @Arg("productDetails") productDetails: ProductDetailsInput[],
+        @Arg("productDetails", () => [ProductDetailsInput])
+        productDetails: ProductDetailsInput[],
         @Ctx() context: MyContext
     ): Promise<OrderResponse> {
         const user = await context.em.findOne(User, { id: userId });
@@ -95,11 +105,15 @@ export class OrderResolver {
         });
         try {
             await order.save();
-            
+
             productDetails.map((detail) => {
-                return this.createProductDetails(order.id, detail.productId, detail.size, context);
-            })
-            
+                return this.createProductDetails(
+                    order.id,
+                    detail.productId,
+                    detail.size,
+                    context
+                );
+            });
         } catch (err) {
             console.log(err.details);
 
@@ -203,7 +217,6 @@ export class OrderResolver {
         @Arg("productId") productId: number,
         @Arg("size") size: string,
         @Ctx() { em }: MyContext
-
     ): Promise<ProductDetailsResponse> {
         const product = await em.findOne(Product, { id: productId });
 
@@ -241,7 +254,6 @@ export class OrderResolver {
             await productDetails.save();
 
             return { productDetails };
-        
         } catch (err) {
             console.log(err.detail);
             return {

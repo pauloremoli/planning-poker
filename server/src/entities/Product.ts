@@ -26,9 +26,9 @@ export class Product extends BaseEntity {
     @Column({ unique: true })
     description!: string;
 
-    @Field()
+    @Field(() => Category)
     @ManyToOne(() => Category, category => category.products)
-    category!: Category;
+    category!: Promise<Category>;
 
     @OneToMany(() => ProductDetails, pd => pd.order)
     orderConnection: Promise<ProductDetails[]>;
