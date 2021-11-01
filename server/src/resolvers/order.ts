@@ -58,7 +58,7 @@ export class OrderResolver {
         @Arg("id") id: number,
         @Ctx() { em }: MyContext
     ): Promise<OrderResponse> {
-        const order = await em.find(Order, {
+        const order = await em.findOne(Order, {
             where: { id },
             relations: ["user", "products"],
         });
@@ -73,7 +73,7 @@ export class OrderResolver {
                 ],
             };
         }
-        console.log(order);
+        console.log({order});
         return { order };
     }
 
