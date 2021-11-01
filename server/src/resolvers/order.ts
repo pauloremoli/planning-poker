@@ -133,6 +133,8 @@ export class OrderResolver {
     @Mutation(() => OrderResponse)
     async updateOrder(
         @Arg("id") id: number,
+        @Arg("rentalDate") rentalDate: Date,
+        @Arg("status", () => OrderStatus) status: OrderStatus,
         @Ctx() { em }: MyContext
     ): Promise<OrderResponse> {
         let order = await em.findOne(Order, { id });
@@ -148,6 +150,8 @@ export class OrderResolver {
         }
 
         try {
+            order.rentalDate = rentalDate;
+            order.status = status;
             await em.save(order);
         } catch (err) {
             console.log(err.details);
