@@ -73,7 +73,7 @@ export class OrderResolver {
                 ],
             };
         }
-        console.log({order});
+        console.log({ order });
         return { order };
     }
 
@@ -169,50 +169,18 @@ export class OrderResolver {
         return { order };
     }
 
-    @Mutation(() => OrderResponse)
+    @Mutation(() => Boolean)
     async deleteOrder(
         @Arg("id") id: number,
         @Ctx() { em }: MyContext
-    ): Promise<OrderResponse> {
-        let order = await em.findOne(Order, { id });
-        if (!order) {
-            return {
-                errors: [
-                    {
-                        field: "id",
-                        message: "Order doesn't exists",
-                    },
-                ],
-            };
-        }
-
+    ): Promise<Boolean> {
         try {
-            await em.delete(Order, order);
+            let result = await em.delete(Order, { id });
+            return result.affected != 0;
         } catch (err) {
             console.log(err.details);
-
-            if (err.code === "23505") {
-                return {
-                    errors: [
-                        {
-                            field: "name",
-                            message: "Order name already exists",
-                        },
-                    ],
-                };
-            } else {
-                return {
-                    errors: [
-                        {
-                            field: "order",
-                            message: err.detail,
-                        },
-                    ],
-                };
-            }
+            return false;
         }
-
-        return { order };
     }
 
     @Mutation(() => ProductDetailsResponse, { nullable: true })

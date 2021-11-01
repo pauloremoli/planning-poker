@@ -23,6 +23,7 @@ export class ProductDetails extends BaseEntity {
     @Field(() => Product)
     @ManyToOne(() => Product, (product) => product.orderConnection, {
         primary: true,
+        onDelete: "CASCADE"
     })
     @JoinColumn({ name: "productId" })
     product: Promise<Product>;
@@ -30,6 +31,7 @@ export class ProductDetails extends BaseEntity {
     @Field(() => Order)
     @ManyToOne(() => Order, (order) => order.products, {
         primary: true,
+        onDelete: "CASCADE"
     })
     @JoinColumn({ name: "orderId" })
     order: Promise<Order>;
