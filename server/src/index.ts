@@ -1,25 +1,23 @@
-import { OrderResolver } from "./resolvers/order";
-import { ProductDetails } from "./entities/ProductDetails";
-import { ProductResolver } from "./resolvers/product";
-import { CategoryResolver } from "./resolvers/category";
+import { ApolloServer } from "apollo-server-express";
+import connectRedis from "connect-redis";
+import cors from "cors";
+import express from "express";
+import session from "express-session";
+import Redis from "ioredis";
+import morgan from "morgan";
+import "reflect-metadata";
+import { buildSchema } from "type-graphql";
+import { createConnection } from "typeorm";
+import { COOKIE_NAME, __prod__ } from "./constants";
+import { Category } from "./entities/Category";
 import { Order } from "./entities/Order";
 import { Product } from "./entities/Product";
-import "reflect-metadata";
-import { __prod__, COOKIE_NAME } from "./constants";
-import express from "express";
-import { ApolloServer } from "apollo-server-express";
-import { buildSchema } from "type-graphql";
-import { UserResolver } from "./resolvers/user";
-import Redis from "ioredis";
-import session from "express-session";
-import connectRedis from "connect-redis";
-import morgan from "morgan";
-import cors from "cors";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import { createConnection, getConnection } from "typeorm";
+import { ProductDetails } from "./entities/ProductDetails";
 import { User } from "./entities/User";
-import { Category } from "./entities/Category";
+import { CategoryResolver } from "./resolvers/category";
+import { OrderResolver } from "./resolvers/order";
+import { ProductResolver } from "./resolvers/product";
+import { UserResolver } from "./resolvers/user";
 import { createProductsLoader } from "./utils/productsLoader";
 
 require("dotenv-safe").config();
@@ -27,9 +25,7 @@ require("dotenv-safe").config();
 const main = async () => {
     const conn = await createConnection({
         type: "postgres",
-        database: "sonhoencantado",
-        username: "postgres",
-        password: "postgres",
+        url: process.env.DATABASE_URL,
         logging: true,
         synchronize: true,
         entities: [User, Category, Product, Order, ProductDetails],
@@ -39,8 +35,10 @@ const main = async () => {
     app.use(
         cors({
             credentials: true,
-            //origin: "http://localhost:3000",
-            origin: "https://studio.apollographql.com",
+            origin: [
+                "http://localhost:3000",
+                "https://studio.apollographql.com",
+            ],
         })
     );
 
@@ -90,31 +88,6 @@ const main = async () => {
     apolloServer.applyMiddleware({
         app,
         cors: false,
-    });
-
-    const httpServer = createServer(app);
-    const io = new Server(httpServer, {
-        cors: {
-            origin: "http://localhost:3000",
-            methods: ["GET", "POST"],
-        },
-    });
-
-    io.on("connection", (socket) => {
-        console.log(`User Connected: ${socket.id}`);
-
-        socket.on("join_room", (data) => {
-            socket.join(data);
-            console.log(`User with ID: ${socket.id} joined room: ${data}`);
-        });
-
-        socket.on("send_message", (data) => {
-            socket.to(data.room).emit("receive_message", data);
-        });
-
-        socket.on("disconnect", () => {
-            console.log("User Disconnected", socket.id);
-        });
     });
 
     const port = process.env.PORT;
