@@ -21,7 +21,6 @@ import { createConnection, getConnection } from "typeorm";
 import { User } from "./entities/User";
 import { Category } from "./entities/Category";
 import { createProductsLoader } from "./utils/productsLoader";
-import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
 
 require("dotenv-safe").config();
 
@@ -85,11 +84,6 @@ const main = async () => {
             redis: redis,
             productsLoader: createProductsLoader(),
         }),
-        plugins: [
-            ApolloServerLoaderPlugin({
-                typeormGetConnection: getConnection, // for use with TypeORM
-            }),
-        ],
     });
 
     await apolloServer.start();
