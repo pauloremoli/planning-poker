@@ -7,14 +7,11 @@ import {
     PrimaryGeneratedColumn,
 } from "typeorm";
 
-@ObjectType()
 export enum UserRole {
     ADMIN = "admin",
     CLIENT = "client",
 }
 
-
-@ObjectType()
 export enum IdType {
     RG = "rg",
     CPF = "cpf",

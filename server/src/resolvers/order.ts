@@ -1,3 +1,4 @@
+import { isAuth, isAdmin } from './../middleware/isAuth';
 import { ProductDetails } from "./../entities/ProductDetails";
 import {
     Resolver,
@@ -9,10 +10,11 @@ import {
     Query,
     InputType,
     registerEnumType,
+    UseMiddleware,
 } from "type-graphql";
 import { MyContext } from "../types";
 import { Order, OrderStatus } from "../entities/Order";
-import { User } from "../entities/User";
+import { User, UserRole } from "../entities/User";
 import { FieldError } from "./FieldError";
 import { Product } from "../entities/Product";
 
@@ -48,20 +50,25 @@ class ProductDetailsResponse {
 
 @Resolver()
 export class OrderResolver {
+
     @Query(() => [Order], { nullable: true })
+    @UseMiddleware(isAdmin)
     async orders(@Ctx() { em }: MyContext): Promise<Order[]> {
         return await em.find(Order, { relations: ["user", "products"] });
     }
 
     @Query(() => OrderResponse)
+    @UseMiddleware(isAuth)
     async order(
         @Arg("id") id: number,
-        @Ctx() { em }: MyContext
+        @Ctx() { req, em }: MyContext
     ): Promise<OrderResponse> {
         const order = await em.findOne(Order, {
             where: { id },
             relations: ["user", "products"],
         });
+
+        await isSameUser(em, req, order);
 
         if (!order) {
             return {
@@ -131,6 +138,7 @@ export class OrderResolver {
     }
 
     @Mutation(() => OrderResponse)
+    @UseMiddleware(isAdmin)
     async updateOrder(
         @Arg("id") id: number,
         @Arg("rentalDate") rentalDate: Date,
@@ -170,6 +178,7 @@ export class OrderResolver {
     }
 
     @Mutation(() => Boolean)
+    @UseMiddleware(isAdmin)
     async deleteOrder(
         @Arg("id") id: number,
         @Ctx() { em }: MyContext
@@ -184,6 +193,7 @@ export class OrderResolver {
     }
 
     @Mutation(() => ProductDetailsResponse, { nullable: true })
+    @UseMiddleware(isAuth)
     async createProductDetails(
         @Arg("orderId") orderId: number,
         @Arg("productId") productId: number,
@@ -239,3 +249,4 @@ export class OrderResolver {
         }
     }
 }
+

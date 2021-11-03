@@ -12,7 +12,6 @@ import {
 import { ProductDetails } from './ProductDetails';
 import { User } from "./User";
 
-@ObjectType()
 export enum OrderStatus {
     PENDING = "pending",
     APPROVED = "approved",

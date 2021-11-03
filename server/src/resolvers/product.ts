@@ -1,3 +1,4 @@
+import { isAdmin } from './../middleware/isAuth';
 import { Category } from "../entities/Category";
 import {
     Resolver,
@@ -7,6 +8,7 @@ import {
     Mutation,
     ObjectType,
     Query,
+    UseMiddleware,
 } from "type-graphql";
 import { MyContext } from "../types";
 import { Product } from "../entities/Product";
@@ -51,6 +53,7 @@ export class ProductResolver {
     }
 
     @Mutation(() => ProductResponse)
+    @UseMiddleware(isAdmin)
     async createProduct(
         @Arg("name") name: string,
         @Arg("description") description: string,
@@ -112,6 +115,7 @@ export class ProductResolver {
     }
 
     @Mutation(() => ProductResponse)
+    @UseMiddleware(isAdmin)
     async updateProduct(
         @Arg("id") id: number,
         @Arg("name") name: string,
@@ -183,6 +187,7 @@ export class ProductResolver {
     }
 
     @Mutation(() => ProductResponse)
+    @UseMiddleware(isAdmin)
     async deleteProduct(
         @Arg("id") id: number,
         @Ctx() { em }: MyContext
