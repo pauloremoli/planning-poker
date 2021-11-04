@@ -1,21 +1,17 @@
-import { Color } from "@material-ui/core";
 import React from "react";
 import styled from "styled-components";
 
 interface InfoContainerProps {
     bgColor?: string;
 }
+
 const InfoContainer = styled.div<InfoContainerProps>`
     flex: 1;
-    height: 100%;
-    width: 100%;
     padding: 50px;
     justify-content: center;
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: ${(props) =>
-        props.bgColor ? props.bgColor : "transparent"};
 `;
 
 const Title = styled.h1`
@@ -55,7 +51,7 @@ const SliderInfoContainer: React.FC<SliderInfoContainerProps> = ({
     return (
         <InfoContainer bgColor={bgColor}>
             <Title>{title.toUpperCase()}</Title>
-            <Description>{description}</Description>
+            <Description>{description.toUpperCase()}</Description>
             <Button>{btnText.toUpperCase()}</Button>
         </InfoContainer>
     );

@@ -1,27 +1,26 @@
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@material-ui/icons";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import SliderInfoContainer from "./SliderInfoContainer";
 
 const Container = styled.div`
     width: 100%;
     height: calc(100vh - 90px);
+    display: flex;
     position: relative;
     overflow: hidden;
 `;
-
 interface ArrowProps {
     direction: string;
 }
 
 const Arrow = styled.div<ArrowProps>`
-    z-index: 1;
     width: 50px;
     height: 50px;
-    background-color: #f8f8f8;
-    display: flex;
+    background-color: #fff7f7;
     border-radius: 50%;
+    display: flex;
     align-items: center;
     justify-content: center;
     position: absolute;
@@ -31,31 +30,38 @@ const Arrow = styled.div<ArrowProps>`
     right: ${(props) => props.direction === "right" && "10px"};
     margin: auto;
     cursor: pointer;
+    opacity: 0.5;
+    z-index: 2;
 `;
 
-const Wrapper = styled.div`
+interface WrapperProps {
+    slideIndex: number;
+}
+
+const Wrapper = styled.div<WrapperProps>`
     height: 100%;
     display: flex;
+    transition: all 1.5s ease;
+    transform: translateX(${(props) => props.slideIndex * -100}vw);
 `;
 
-const Slide = styled.div`
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-`;
-
-interface ImgContainerProps {
+interface SlideProps {
     bgColor?: string;
 }
 
-const ImgContainer = styled.div<ImgContainerProps>`
+const Slide = styled.div<SlideProps>`
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    background-color: #${(props) => props.bgColor};
+`;
+
+const ImgContainer = styled.div`
     height: 100%;
     width: 100%;
     flex: 1;
     position: relative;
-    background-color: ${(props) =>
-        props.bgColor ? props.bgColor : "transparent"};
 `;
 
 const sliderData = [
@@ -76,21 +82,36 @@ const sliderData = [
 ];
 
 const Slider: React.FC<{}> = () => {
+    const [slideIndex, setSlideIndex] = useState(0);
+
+    const handleClick = (direction: string) => {
+        if (direction === "left") {
+            setSlideIndex((previous) =>
+                previous === 0 ? sliderData.length - 1 : previous - 1
+            );
+        } else {
+            setSlideIndex((previous) =>
+                previous === sliderData.length - 1 ? 0 : previous + 1
+            );
+        }
+    };
     return (
         <>
             <Container>
-                <Arrow direction="left">
+                <Arrow direction="left" onClick={() => handleClick("left")}>
                     <ArrowLeftOutlined />
                 </Arrow>
-                <Wrapper>
-                    <Slide>
-                        {sliderData.map((data) => (
-                            <>
-                                <ImgContainer bgColor={data.bgColor}>
+                <Wrapper slideIndex={slideIndex}>
+                    {sliderData.map((data) => (
+                        <>
+                            <Slide bgColor={data.bgColor}>
+                                <ImgContainer>
                                     <Image
                                         src={data.img}
-                                        layout="fill"
-                                        objectFit="scale-down"
+                                        width="100%"
+                                        height="100%"
+                                        layout="responsive"
+                                        objectFit="contain"
                                     />
                                 </ImgContainer>
                                 <SliderInfoContainer
@@ -99,11 +120,11 @@ const Slider: React.FC<{}> = () => {
                                     btnText={data.btnText}
                                     bgColor={data.bgColor}
                                 />
-                            </>
-                        ))}
-                    </Slide>
+                            </Slide>
+                        </>
+                    ))}
                 </Wrapper>
-                <Arrow direction="right">
+                <Arrow direction="right" onClick={() => handleClick("right")}>
                     <ArrowRightOutlined />
                 </Arrow>
             </Container>
