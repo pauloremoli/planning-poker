@@ -1,50 +1,27 @@
-import { ChakraProvider, ColorModeProvider } from "@chakra-ui/react";
+import { ThemeProvider } from "styled-components";
+import GlobalStyle from "../styles/globals";
+import Home from "./Home";
 
-import theme from "../theme";
-import {
-    ApolloClient,
-    InMemoryCache,
-    ApolloProvider,
-    from,
-    HttpLink,
-} from "@apollo/client";
-import { onError } from "@apollo/client/link/error";
+const theme = {
+    colors: {
+        primary: "#000000",
+    },
+};
 
-function MyApp({ Component, pageProps }) {
-    const errorLink = onError(({ graphQLErrors }) => {
-        if (graphQLErrors) {
-            graphQLErrors.map(({ message }) => {
-                alert(`Graphql error ${message}`);
-            });
-        }
-    });
-
-    const link = from([
-        errorLink,
-        new HttpLink({
-            uri: "http://localhost:3001/graphql",
-            credentials: "include",
-        }),
-    ]);
-
-    const client = new ApolloClient({
-        cache: new InMemoryCache(),
-        link: link,
-    });
-
-    return (
-        <ApolloProvider client={client}>
-            <ChakraProvider resetCSS theme={theme}>
-                <ColorModeProvider
-                    options={{
-                        useSystemColorMode: true,
-                    }}
-                >
-                    <Component {...pageProps} />
-                </ColorModeProvider>
-            </ChakraProvider>
-        </ApolloProvider>
-    );
+interface MyAppProps {
+    Component: any;
+    pageProps: any;
 }
+
+const MyApp: React.FC<MyAppProps> = () => {
+    return (
+        <>
+            <GlobalStyle />
+            <ThemeProvider theme={theme}>
+                <Home/>
+            </ThemeProvider>
+        </>
+    );
+};
 
 export default MyApp;

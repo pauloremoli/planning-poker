@@ -1,129 +1,96 @@
-import React, { ReactNode } from "react";
-import NextLink from "next/link";
-import { useLogoutMutation, useMeQuery } from "../generated/graphql";
-import { useApolloClient } from "@apollo/client";
-import {
-    Box,
-    Flex,
-    Link,
-    Button,
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    MenuDivider,
-    useDisclosure,
-    useColorModeValue,
-    Stack,
-    useColorMode,
-    Center,
-    Text,
-} from "@chakra-ui/react";
-import CustomAvatar from "./CustomAvatar";
+import React from "react";
+import styled from "styled-components";
+import { Search, ShoppingCartOutlined } from "@material-ui/icons";
+import { Badge } from "@material-ui/core";
 
-const NavLink = ({ children }: { children: ReactNode }) => (
-    <Link
-        px={2}
-        py={1}
-        rounded={"md"}
-        _hover={{
-            textDecoration: "none",
-            bg: useColorModeValue("gray.200", "gray.700"),
-        }}
-        href={"#"}
-    >
-        {children}
-    </Link>
-);
+const Container = styled.div`
+    height: 60px;
+`;
 
-export default function Navbar() {
-    const [logout, { loading: logoutFetching }] = useLogoutMutation();
-    const apolloClient = useApolloClient();
+const Wrapper = styled.div`
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+`;
 
-    const { data } = useMeQuery();
+const Left = styled.div`
+    flex: 1;
+    display: flex;
+    align-items: center;
+`;
 
-    let menuItems = null;
+const Right = styled.div`
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+`;
 
-    if (data?.me) {
-        console.log(data);
+const Center = styled.div`
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
 
-        menuItems = (
-            <>
-                <Flex alignItems={"center"}>
-                    <Stack direction={"row"} spacing={7}>
-                        <Menu>
-                            <MenuButton
-                                as={Button}
-                                rounded={"full"}
-                                variant={"link"}
-                                cursor={"pointer"}
-                                minW={0}
-                            >
-                                <CustomAvatar
-                                    size="sm"
-                                    url={data?.me?.avatar}
-                                />
-                            </MenuButton>
-                            <MenuList alignItems={"center"}>
-                                <br />
-                                <Center>
-                                    <CustomAvatar
-                                        size="2xl"
-                                        url={data?.me?.avatar}
-                                    />
-                                </Center>
-                                <br />
-                                <Center>
-                                    <p>{data?.me?.username}</p>
-                                </Center>
-                                <br />
-                                <MenuDivider />
-                                <NextLink href="/profile">
-                                <MenuItem>Edit profile</MenuItem>
-                                </NextLink>
-                                <NextLink href="/login">
-                                    <MenuItem
-                                        onClick={() => {
-                                            logout();
-                                            apolloClient.resetStore();
-                                        }}
-                                    >
-                                        Log out
-                                    </MenuItem>
-                                </NextLink>
-                            </MenuList>
-                        </Menu>
-                    </Stack>
-                </Flex>
-            </>
-        );
-    } else {
-        menuItems = (
-            <>
-                <Flex>
-                    <NextLink href="/login">
-                        <Link mr={2}>Log in</Link>
-                    </NextLink>
-                    <NextLink href="/register">
-                        <Link>Sign up</Link>
-                    </NextLink>
-                </Flex>
-            </>
-        );
-    }
+const Language = styled.span`
+    font-size: 14px;
+    cursor: pointer;
+`;
 
+const SearchContainer = styled.div`
+    border: 0.5px solid lightgray;
+    display: flex;
+    align-items: center;
+    margin-left: 25px;
+    padding: 5px;
+`;
+
+const Input = styled.input`
+    border: none;
+`;
+
+const Logo = styled.span`
+    font-weight: bold;
+    font-size: 20px;
+`;
+
+const MenuItem = styled.div`
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 25px;
+    padding: 5px;
+`;
+
+const Navbar: React.FC<{}> = ({}) => {
     return (
         <>
-            <Box bg={useColorModeValue("gray.100", "gray.900")} px={4}>
-                <Flex
-                    h={16}
-                    alignItems={"center"}
-                    justifyContent={"space-between"}
-                >
-                    <Box>Logo</Box>
-                    {menuItems}
-                </Flex>
-            </Box>
+            <Container>
+                <Wrapper>
+                    <Left>
+                        <SearchContainer>
+                            <Input placeholder="Pesquisa por tema"/>
+                            <Search style={{ color: "gray", fontSize: 16, cursor: "pointer"}} />
+                        </SearchContainer>
+                    </Left>
+                    <Center>
+                        <Logo>SONHO ENCANTADO</Logo>
+                    </Center>
+                    <Right>
+                        <MenuItem>CADASTRO</MenuItem>
+
+                        <MenuItem>ENTRAR</MenuItem>
+                        <MenuItem>
+                            <Badge badgeContent={4} color="primary">
+                                <ShoppingCartOutlined />
+                            </Badge>
+                        </MenuItem>
+                    </Right>
+                </Wrapper>
+            </Container>
         </>
     );
-}
+};
+
+export default Navbar;
