@@ -34,11 +34,6 @@ const Center = styled.div`
     justify-content: center;
 `;
 
-const Language = styled.span`
-    font-size: 14px;
-    cursor: pointer;
-`;
-
 const SearchContainer = styled.div`
     border: 0.5px solid lightgray;
     display: flex;
@@ -82,7 +77,7 @@ const Navbar: React.FC<{}> = ({}) => {
 
                         <MenuItem>ENTRAR</MenuItem>
                         <MenuItem>
-                            <Badge badgeContent={4} color="primary">
+                            <Badge badgeContent={1} color="primary">
                                 <ShoppingCartOutlined />
                             </Badge>
                         </MenuItem>

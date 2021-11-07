@@ -33,6 +33,13 @@ const Button = styled.button`
     width: 500px;
     background-color: transparent;
     cursor: pointer;
+    transition: all 0.5s ease;
+    background-color: teal;
+    color: white;
+
+    &:hover {
+        background-color: #017070;
+    }
 `;
 
 interface SliderInfoContainerProps {

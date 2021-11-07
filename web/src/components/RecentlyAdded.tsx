@@ -7,7 +7,7 @@ const Container = styled.div`
     padding: 20px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
 `;
 
@@ -15,12 +15,12 @@ const Header = styled.h1`
     padding: 20px;
 `;
 
-const Products: React.FC<{}> = () => {
+const RecentlyAdded: React.FC<{}> = () => {
     return (
         <>
-            <Header>Produtos em destaque</Header>
+            <Header>Novidades</Header>
             <Container>
-                {productsData.map((item) => {
+                {productsData.slice(0, 5).map((item) => {
                     return <Product item={item} />;
                 })}
             </Container>
@@ -28,4 +28,4 @@ const Products: React.FC<{}> = () => {
     );
 };
 
-export default Products;
+export default RecentlyAdded;

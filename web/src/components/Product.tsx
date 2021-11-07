@@ -13,7 +13,7 @@ const Info = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 3;
     display: flex;
     flex-direction: column;
@@ -25,7 +25,6 @@ const Info = styled.div`
 
 const Container = styled.div`
     flex: 1;
-    flex-grow: 0;
     margin: 5px;
     min-width: 280px;
     height: 350px;
@@ -39,15 +38,6 @@ const Container = styled.div`
     &:hover ${Info} {
         opacity: 1;
     }
-`;
-
-const Circle = styled.div`
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background-color: white;
-    position: absolute;
-    z-index: -1;
 `;
 
 const Title = styled.h1`
@@ -90,7 +80,6 @@ interface ProductProps {
 const Product: React.FC<ProductProps> = ({ item }) => {
     return (
         <Container key={item.id}>
-            <Circle />
             <Image src={item.img} layout="fill" objectFit="cover" />
             <Info>
                 <Title>{item.title} </Title>

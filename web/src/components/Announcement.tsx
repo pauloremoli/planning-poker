@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { announcements } from "./data";
 
 const Container = styled.div`
     height: 30px;
@@ -11,14 +12,10 @@ const Container = styled.div`
     justify-content: center;
 `;
 
-interface AnnouncementProps {
-    content: string;
-}
-
-const Announcement: React.FC<AnnouncementProps> = ({ content }) => {
+const Announcement: React.FC<{}> = () => {
     return (
         <>
-            <Container>{content}</Container>
+            <Container>{announcements}</Container>
         </>
     );
 };

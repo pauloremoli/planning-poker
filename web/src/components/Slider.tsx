@@ -2,6 +2,7 @@ import { ArrowLeftOutlined, ArrowRightOutlined } from "@material-ui/icons";
 import Image from "next/image";
 import React, { useState } from "react";
 import styled from "styled-components";
+import { sliderData } from "./data";
 import SliderInfoContainer from "./SliderInfoContainer";
 
 const Container = styled.div`
@@ -10,6 +11,7 @@ const Container = styled.div`
     display: flex;
     position: relative;
     overflow: hidden;
+    transition: all 1.5s ease;
 `;
 interface ArrowProps {
     direction: string;
@@ -18,7 +20,7 @@ interface ArrowProps {
 const Arrow = styled.div<ArrowProps>`
     width: 50px;
     height: 50px;
-    background-color: #fff7f7;
+    background-color: lightgray;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -26,12 +28,18 @@ const Arrow = styled.div<ArrowProps>`
     position: absolute;
     top: 0;
     bottom: 0;
-    left: ${(props) => props.direction === "left" && "10px"};
-    right: ${(props) => props.direction === "right" && "10px"};
+    left: ${(props) => props.direction === "left" && "20px"};
+    right: ${(props) => props.direction === "right" && "20px"};
     margin: auto;
     cursor: pointer;
     opacity: 0.5;
     z-index: 2;
+
+    &:hover{
+        background-color: teal;
+        opacity: 1;
+        transform: scale(1.5);
+    }
 `;
 
 interface WrapperProps {
@@ -64,23 +72,6 @@ const ImgContainer = styled.div`
     position: relative;
 `;
 
-const sliderData = [
-    {
-        img: "/party.svg",
-        title: "A decoração com seu estilo",
-        description: "Temas variados para diversos tipos de eventos",
-        btnText: "ENCONTRE AGORA O SEU TEMA",
-        bgColor: "red",
-    },
-    {
-        img: "/party.svg",
-        title: "A decoração com seu estilo",
-        description: "Temas variados para diversos tipos de eventos",
-        btnText: "ENCONTRE AGORA O SEU TEMA",
-        bgColor: "green",
-    },
-];
-
 const Slider: React.FC<{}> = () => {
     const [slideIndex, setSlideIndex] = useState(0);
 
@@ -104,7 +95,7 @@ const Slider: React.FC<{}> = () => {
                 <Wrapper slideIndex={slideIndex}>
                     {sliderData.map((data) => (
                         <>
-                            <Slide bgColor={data.bgColor}>
+                            <Slide bgColor={data.bgColor} key={data.title}>
                                 <ImgContainer>
                                     <Image
                                         src={data.img}
