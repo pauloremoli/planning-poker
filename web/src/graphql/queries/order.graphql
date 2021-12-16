@@ -1,0 +1,47 @@
+query Orders {
+  orders {
+    user {
+      username
+      id
+    }
+    updatedAt
+    status
+    rentalDate
+    id
+    products {
+      product {
+        name
+        price
+      }
+      size
+      updatedAt
+      createdAt
+    }
+    createdAt
+    amount
+  }
+}
+
+query Order($orderId: Float!) {
+  order(id: $orderId) {
+    order {
+      user {
+        username
+        id
+      }
+      updatedAt
+      status
+      rentalDate
+      products {
+        size
+        product {
+          price
+          name
+          id
+        }
+      }
+      amount
+      id
+    }
+  }
+}

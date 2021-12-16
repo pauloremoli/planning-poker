@@ -1,3 +1,4 @@
+import { isSameUser } from './../utils/isSameUser';
 import { isAuth, isAdmin } from './../middleware/isAuth';
 import { ProductDetails } from "./../entities/ProductDetails";
 import {
@@ -14,7 +15,7 @@ import {
 } from "type-graphql";
 import { MyContext } from "../types";
 import { Order, OrderStatus } from "../entities/Order";
-import { User, UserRole } from "../entities/User";
+import { User } from "../entities/User";
 import { FieldError } from "./FieldError";
 import { Product } from "../entities/Product";
 
@@ -52,13 +53,13 @@ class ProductDetailsResponse {
 export class OrderResolver {
 
     @Query(() => [Order], { nullable: true })
-    @UseMiddleware(isAdmin)
+    //@UseMiddleware(isAdmin)
     async orders(@Ctx() { em }: MyContext): Promise<Order[]> {
         return await em.find(Order, { relations: ["user", "products"] });
     }
 
     @Query(() => OrderResponse)
-    @UseMiddleware(isAuth)
+    //@UseMiddleware(isAuth)
     async order(
         @Arg("id") id: number,
         @Ctx() { req, em }: MyContext
@@ -68,7 +69,17 @@ export class OrderResolver {
             relations: ["user", "products"],
         });
 
-        await isSameUser(em, req, order);
+        if(!order?.user.id)
+        return {
+            errors: [
+                {
+                    field: "user",
+                    message: "User id doesn't exists",
+                },
+            ],
+        };
+        
+        await isSameUser(em, req, order?.user.id);
 
         if (!order) {
             return {
