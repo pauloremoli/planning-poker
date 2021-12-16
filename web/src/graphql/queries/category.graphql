@@ -1,0 +1,13 @@
+query Categories {
+  categories {
+    name
+    id
+  }
+}
+
+query Category($categoryId: Float!) {
+  category(id: $categoryId) {
+    name
+    id
+  }
+}

@@ -10,15 +10,9 @@ const Container = styled.div`
     align-items: center;
 `;
 
-const Header = styled.h1`
-    margin-top: 30px;
-    padding: 20px;
-`;
-
 const Categories: React.FC<{}> = ({}) => {
     return (
         <>
-            <Header>Categorias</Header>
             <Container>
                 {categoriesData.map((item) => {
                     return <Category category={item} />;

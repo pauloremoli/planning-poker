@@ -1,4 +1,4 @@
-import { isAdmin } from './../middleware/isAuth';
+import { isAdmin } from "./../middleware/isAuth";
 import { Category } from "../entities/Category";
 import {
     Resolver,
@@ -9,10 +9,12 @@ import {
     ObjectType,
     Query,
     UseMiddleware,
+    Int,
 } from "type-graphql";
 import { MyContext } from "../types";
 import { Product } from "../entities/Product";
 import { FieldError } from "./FieldError";
+import { getConnection } from "typeorm";
 
 @ObjectType()
 class ProductResponse {
@@ -23,12 +25,42 @@ class ProductResponse {
     product?: Product;
 }
 
+@ObjectType()
+class ProductsResponse {
+    @Field()
+    hasMore: Boolean;
+
+    @Field(() => [Product], { nullable: true })
+    products?: Product[];
+}
+
 @Resolver()
 export class ProductResolver {
-    @Query(() => [Product], { nullable: true })
-    async products(@Ctx() { em }: MyContext) {
-        const products = await em.find(Product, { relations: ["category"] });
-        return products;
+    @Query(() => ProductsResponse)
+    async products(
+        @Arg("limit", () => Int) limit: number,
+        @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+    ): Promise<ProductsResponse> {
+        const realLimit = Math.min(50, limit);
+        const reaLimitPlusOne = realLimit + 1;
+        const qb = getConnection()
+            .getRepository(Product)
+            .createQueryBuilder("p")
+            .orderBy('p."createdAt"', "DESC")
+            .take(reaLimitPlusOne);
+
+        if (cursor) {
+            qb.where('p."createdAt" < :cursor', {
+                cursor: new Date(parseInt(cursor)),
+            });
+        }
+
+        const products = await qb.getMany();
+
+        return {
+            products: products.slice(0, realLimit),
+            hasMore: products.length === reaLimitPlusOne,
+        };
     }
 
     @Query(() => ProductResponse, { nullable: true })

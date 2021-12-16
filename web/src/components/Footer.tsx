@@ -128,12 +128,28 @@ const Footer: React.FC<{}> = ({}) => {
                 <Center>
                     <Title>Links uteís</Title>
                     <List>
-                        <ListItem>Home</ListItem>
-                        <ListItem>Carrinho</ListItem>
-                        <ListItem>Minha conta</ListItem>
-                        <ListItem>Pedidos</ListItem>
-                        <ListItem>Favoritos</ListItem>
-                        <ListItem>Como funciona</ListItem>
+                        <NextLink href="/home">
+                            <ListItem>Home</ListItem>
+                        </NextLink>
+
+                        <NextLink href="/cart">
+                            <ListItem>Carrinho</ListItem>
+                        </NextLink>
+
+                        <NextLink href="/account">
+                            <ListItem>Minha conta</ListItem>
+                        </NextLink>
+
+                        <NextLink href="/orders">
+                            <ListItem>Pedidos</ListItem>
+                        </NextLink>
+
+                        <NextLink href="/favorites">
+                            <ListItem>Favoritos</ListItem>
+                        </NextLink>
+                        <NextLink href="/como_funciona">
+                            <ListItem>Como funciona</ListItem>
+                        </NextLink>
                     </List>
                 </Center>
                 <Right>

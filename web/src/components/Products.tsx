@@ -9,6 +9,7 @@ const Container = styled.div`
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
+    margin-bottom: 50px;
 `;
 
 const Header = styled.h1`
@@ -18,7 +19,6 @@ const Header = styled.h1`
 const Products: React.FC<{}> = () => {
     return (
         <>
-            <Header>Produtos em destaque</Header>
             <Container>
                 {productsData.map((item) => {
                     return <Product item={item} />;

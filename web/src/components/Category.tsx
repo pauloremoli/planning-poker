@@ -1,11 +1,11 @@
 import React from "react";
 import styled from "styled-components";
+import NextLink from "next/link";
 
 const Container = styled.div`
     flex: 1;
     margin: 10px;
     padding: 10px;
-    height: 100px;
     position: relative;
     transition: all 0.5s ease;
     display: flex;
@@ -41,7 +41,9 @@ interface CategoryProps {
 const Category: React.FC<CategoryProps> = ({ category: item }) => {
     return (
         <Container key={item.id}>
-            <Title>{item.title.toLocaleUpperCase()}</Title>
+            <NextLink href={`/products/?category=${item.id}`}>
+                <Title>{item.title.toLocaleUpperCase()}</Title>
+            </NextLink>
         </Container>
     );
 };

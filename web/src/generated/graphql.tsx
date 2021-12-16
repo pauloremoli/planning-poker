@@ -12,6 +12,20 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
+  DateTime: any;
+};
+
+export type Category = {
+  __typename?: 'Category';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+};
+
+export type CategoryResponse = {
+  __typename?: 'CategoryResponse';
+  category?: Maybe<Category>;
+  errors?: Maybe<Array<FieldError>>;
 };
 
 export type FieldError = {
@@ -20,16 +34,29 @@ export type FieldError = {
   message: Scalars['String'];
 };
 
+export enum IdType {
+  Cpf = 'CPF',
+  Passport = 'PASSPORT',
+  Rg = 'RG'
+}
+
 export type Mutation = {
   __typename?: 'Mutation';
   changePassword: UserResponse;
-  createPost: Post;
-  deletePost: Scalars['Boolean'];
+  createCategory: CategoryResponse;
+  createOrder: OrderResponse;
+  createProduct: ProductResponse;
+  createProductDetails?: Maybe<ProductDetailsResponse>;
+  deleteCategory: CategoryResponse;
+  deleteOrder: Scalars['Boolean'];
+  deleteProduct: ProductResponse;
   forgotPassword: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
   register: UserResponse;
-  updatePost: Post;
+  updateCategory: CategoryResponse;
+  updateOrder: OrderResponse;
+  updateProduct: ProductResponse;
 };
 
 
@@ -39,13 +66,48 @@ export type MutationChangePasswordArgs = {
 };
 
 
-export type MutationCreatePostArgs = {
-  title: Scalars['String'];
+export type MutationCreateCategoryArgs = {
+  name: Scalars['String'];
 };
 
 
-export type MutationDeletePostArgs = {
-  id: Scalars['Int'];
+export type MutationCreateOrderArgs = {
+  amount: Scalars['Float'];
+  productDetails: Array<ProductDetailsInput>;
+  rentalDate: Scalars['DateTime'];
+  userId: Scalars['Float'];
+};
+
+
+export type MutationCreateProductArgs = {
+  categoryId: Scalars['Float'];
+  description: Scalars['String'];
+  name: Scalars['String'];
+  photos: Array<Scalars['String']>;
+  price: Scalars['Float'];
+  stock: Scalars['Float'];
+};
+
+
+export type MutationCreateProductDetailsArgs = {
+  orderId: Scalars['Float'];
+  productId: Scalars['Float'];
+  size: Scalars['String'];
+};
+
+
+export type MutationDeleteCategoryArgs = {
+  id: Scalars['Float'];
+};
+
+
+export type MutationDeleteOrderArgs = {
+  id: Scalars['Float'];
+};
+
+
+export type MutationDeleteProductArgs = {
+  id: Scalars['Float'];
 };
 
 
@@ -61,46 +123,162 @@ export type MutationLoginArgs = {
 
 
 export type MutationRegisterArgs = {
-  avatar: Scalars['String'];
+  address: Scalars['String'];
+  city: Scalars['String'];
   email: Scalars['String'];
+  idType: IdType;
+  identification: Scalars['String'];
   password: Scalars['String'];
+  phone: Scalars['String'];
+  state: Scalars['String'];
+  userRole: UserRole;
   username: Scalars['String'];
+  zipCode: Scalars['String'];
 };
 
 
-export type MutationUpdatePostArgs = {
-  id: Scalars['Int'];
-  title: Scalars['String'];
+export type MutationUpdateCategoryArgs = {
+  id: Scalars['Float'];
+  name: Scalars['String'];
 };
 
-export type Post = {
-  __typename?: 'Post';
+
+export type MutationUpdateOrderArgs = {
+  id: Scalars['Float'];
+  rentalDate: Scalars['DateTime'];
+  status: OrderStatus;
+};
+
+
+export type MutationUpdateProductArgs = {
+  categoryId: Scalars['Float'];
+  description: Scalars['String'];
+  id: Scalars['Float'];
+  name: Scalars['String'];
+  photos: Array<Scalars['String']>;
+  price: Scalars['Float'];
+  stock: Scalars['Float'];
+};
+
+export type Order = {
+  __typename?: 'Order';
+  amount: Scalars['Float'];
   createdAt: Scalars['String'];
-  id: Scalars['Int'];
-  title: Scalars['String'];
+  id: Scalars['Float'];
+  products: Array<ProductDetails>;
+  rentalDate: Scalars['DateTime'];
+  status: Scalars['String'];
   updatedAt: Scalars['String'];
+  user: User;
+};
+
+export type OrderResponse = {
+  __typename?: 'OrderResponse';
+  errors?: Maybe<Array<FieldError>>;
+  order?: Maybe<Order>;
+};
+
+export enum OrderStatus {
+  Approved = 'APPROVED',
+  Canceled = 'CANCELED',
+  Finished = 'FINISHED',
+  Pending = 'PENDING',
+  Renting = 'RENTING'
+}
+
+export type Product = {
+  __typename?: 'Product';
+  category: Category;
+  createdAt: Scalars['String'];
+  description: Scalars['String'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  photos: Array<Scalars['String']>;
+  price: Scalars['Float'];
+  stock: Scalars['Float'];
+  updatedAt: Scalars['String'];
+};
+
+export type ProductDetails = {
+  __typename?: 'ProductDetails';
+  createdAt: Scalars['String'];
+  order: Order;
+  product: Product;
+  size: Scalars['String'];
+  updatedAt: Scalars['String'];
+};
+
+export type ProductDetailsInput = {
+  productId: Scalars['Float'];
+  size: Scalars['String'];
+};
+
+export type ProductDetailsResponse = {
+  __typename?: 'ProductDetailsResponse';
+  errors?: Maybe<Array<FieldError>>;
+  productDetails?: Maybe<ProductDetails>;
+};
+
+export type ProductResponse = {
+  __typename?: 'ProductResponse';
+  errors?: Maybe<Array<FieldError>>;
+  product?: Maybe<Product>;
+};
+
+export type ProductsResponse = {
+  __typename?: 'ProductsResponse';
+  hasMore: Scalars['Boolean'];
+  products?: Maybe<Array<Product>>;
 };
 
 export type Query = {
   __typename?: 'Query';
+  categories?: Maybe<Array<Category>>;
+  category?: Maybe<Category>;
   me?: Maybe<User>;
-  post?: Maybe<Post>;
-  posts: Array<Post>;
+  order: OrderResponse;
+  orders?: Maybe<Array<Order>>;
+  product?: Maybe<ProductResponse>;
+  products: ProductsResponse;
+  users?: Maybe<Array<User>>;
 };
 
 
-export type QueryPostArgs = {
-  id: Scalars['Int'];
+export type QueryCategoryArgs = {
+  id: Scalars['Float'];
+};
+
+
+export type QueryOrderArgs = {
+  id: Scalars['Float'];
+};
+
+
+export type QueryProductArgs = {
+  id: Scalars['Float'];
+};
+
+
+export type QueryProductsArgs = {
+  cursor?: Maybe<Scalars['String']>;
+  limit: Scalars['Int'];
 };
 
 export type User = {
   __typename?: 'User';
-  avatar?: Maybe<Scalars['String']>;
+  address: Scalars['String'];
+  city: Scalars['String'];
   createdAt: Scalars['String'];
   email: Scalars['String'];
   id: Scalars['Int'];
+  idType: Scalars['String'];
+  identification: Scalars['String'];
+  phone: Scalars['String'];
+  state: Scalars['String'];
   updatedAt: Scalars['String'];
+  userRole: Scalars['String'];
   username: Scalars['String'];
+  zipCode: Scalars['String'];
 };
 
 export type UserResponse = {
@@ -109,11 +287,16 @@ export type UserResponse = {
   user?: Maybe<User>;
 };
 
+export enum UserRole {
+  Admin = 'ADMIN',
+  Client = 'CLIENT'
+}
+
 export type ErrorFragmentFragment = { __typename?: 'FieldError', field: string, message: string };
 
-export type UserFragmentFragment = { __typename?: 'User', id: number, username: string, avatar?: string | null | undefined };
+export type UserFragmentFragment = { __typename?: 'User', id: number, username: string };
 
-export type UserResponseFragmentFragment = { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string, avatar?: string | null | undefined } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined };
+export type UserResponseFragmentFragment = { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined };
 
 export type ChangePasswordMutationVariables = Exact<{
   token: Scalars['String'];
@@ -121,14 +304,14 @@ export type ChangePasswordMutationVariables = Exact<{
 }>;
 
 
-export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string, avatar?: string | null | undefined } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
+export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
 
 export type ForgotPasswordMutationVariables = Exact<{
   email: Scalars['String'];
 }>;
 
 
-export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string, avatar?: string | null | undefined } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
+export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
 
 export type LoginMutationVariables = Exact<{
   password: Scalars['String'];
@@ -136,7 +319,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string, avatar?: string | null | undefined } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string } | null | undefined, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -144,30 +327,70 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
 export type RegisterMutationVariables = Exact<{
+  userRole: UserRole;
+  idType: IdType;
+  identification: Scalars['String'];
+  zipCode: Scalars['String'];
+  state: Scalars['String'];
+  city: Scalars['String'];
+  address: Scalars['String'];
+  phone: Scalars['String'];
   email: Scalars['String'];
-  username: Scalars['String'];
   password: Scalars['String'];
-  avatar: Scalars['String'];
+  username: Scalars['String'];
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined, user?: { __typename?: 'User', id: number, username: string, avatar?: string | null | undefined } | null | undefined } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null | undefined } };
+
+export type CategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CategoriesQuery = { __typename?: 'Query', categories?: Array<{ __typename?: 'Category', name: string, id: number }> | null | undefined };
+
+export type CategoryQueryVariables = Exact<{
+  categoryId: Scalars['Float'];
+}>;
+
+
+export type CategoryQuery = { __typename?: 'Query', category?: { __typename?: 'Category', name: string, id: number } | null | undefined };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, username: string, avatar?: string | null | undefined } | null | undefined };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, username: string } | null | undefined };
 
-export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
+export type OrdersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string }> };
+export type OrdersQuery = { __typename?: 'Query', orders?: Array<{ __typename?: 'Order', updatedAt: string, status: string, rentalDate: any, id: number, createdAt: string, amount: number, user: { __typename?: 'User', username: string, id: number }, products: Array<{ __typename?: 'ProductDetails', size: string, updatedAt: string, createdAt: string, product: { __typename?: 'Product', name: string, price: number } }> }> | null | undefined };
+
+export type OrderQueryVariables = Exact<{
+  orderId: Scalars['Float'];
+}>;
+
+
+export type OrderQuery = { __typename?: 'Query', order: { __typename?: 'OrderResponse', order?: { __typename?: 'Order', updatedAt: string, status: string, rentalDate: any, amount: number, id: number, user: { __typename?: 'User', username: string, id: number }, products: Array<{ __typename?: 'ProductDetails', size: string, product: { __typename?: 'Product', price: number, name: string, id: number } }> } | null | undefined } };
+
+export type ProductsQueryVariables = Exact<{
+  limit: Scalars['Int'];
+  cursor?: Maybe<Scalars['String']>;
+}>;
+
+
+export type ProductsQuery = { __typename?: 'Query', products: { __typename?: 'ProductsResponse', hasMore: boolean, products?: Array<{ __typename?: 'Product', price: number, name: string, id: number, description: string, photos: Array<string>, stock: number, createdAt: string, updatedAt: string, category: { __typename?: 'Category', name: string, id: number } }> | null | undefined } };
+
+export type ProductQueryVariables = Exact<{
+  productId: Scalars['Float'];
+}>;
+
+
+export type ProductQuery = { __typename?: 'Query', product?: { __typename?: 'ProductResponse', product?: { __typename?: 'Product', updatedAt: string, stock: number, price: number, photos: Array<string>, name: string, id: number, description: string, createdAt: string, category: { __typename?: 'Category', name: string, id: number } } | null | undefined, errors?: Array<{ __typename?: 'FieldError', message: string, field: string }> | null | undefined } | null | undefined };
 
 export const UserFragmentFragmentDoc = gql`
     fragment UserFragment on User {
   id
   username
-  avatar
 }
     `;
 export const ErrorFragmentFragmentDoc = gql`
@@ -325,23 +548,27 @@ export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const RegisterDocument = gql`
-    mutation Register($email: String!, $username: String!, $password: String!, $avatar: String!) {
+    mutation Register($userRole: UserRole!, $idType: IdType!, $identification: String!, $zipCode: String!, $state: String!, $city: String!, $address: String!, $phone: String!, $email: String!, $password: String!, $username: String!) {
   register(
-    username: $username
-    password: $password
+    userRole: $userRole
+    idType: $idType
+    identification: $identification
+    zipCode: $zipCode
+    state: $state
+    city: $city
+    address: $address
+    phone: $phone
     email: $email
-    avatar: $avatar
+    password: $password
+    username: $username
   ) {
     errors {
       field
       message
     }
-    user {
-      ...UserFragment
-    }
   }
 }
-    ${UserFragmentFragmentDoc}`;
+    `;
 export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
@@ -357,10 +584,17 @@ export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, Regis
  * @example
  * const [registerMutation, { data, loading, error }] = useRegisterMutation({
  *   variables: {
+ *      userRole: // value for 'userRole'
+ *      idType: // value for 'idType'
+ *      identification: // value for 'identification'
+ *      zipCode: // value for 'zipCode'
+ *      state: // value for 'state'
+ *      city: // value for 'city'
+ *      address: // value for 'address'
+ *      phone: // value for 'phone'
  *      email: // value for 'email'
- *      username: // value for 'username'
  *      password: // value for 'password'
- *      avatar: // value for 'avatar'
+ *      username: // value for 'username'
  *   },
  * });
  */
@@ -371,6 +605,77 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const CategoriesDocument = gql`
+    query Categories {
+  categories {
+    name
+    id
+  }
+}
+    `;
+
+/**
+ * __useCategoriesQuery__
+ *
+ * To run a query within a React component, call `useCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCategoriesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCategoriesQuery(baseOptions?: Apollo.QueryHookOptions<CategoriesQuery, CategoriesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CategoriesQuery, CategoriesQueryVariables>(CategoriesDocument, options);
+      }
+export function useCategoriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CategoriesQuery, CategoriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CategoriesQuery, CategoriesQueryVariables>(CategoriesDocument, options);
+        }
+export type CategoriesQueryHookResult = ReturnType<typeof useCategoriesQuery>;
+export type CategoriesLazyQueryHookResult = ReturnType<typeof useCategoriesLazyQuery>;
+export type CategoriesQueryResult = Apollo.QueryResult<CategoriesQuery, CategoriesQueryVariables>;
+export const CategoryDocument = gql`
+    query Category($categoryId: Float!) {
+  category(id: $categoryId) {
+    name
+    id
+  }
+}
+    `;
+
+/**
+ * __useCategoryQuery__
+ *
+ * To run a query within a React component, call `useCategoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCategoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCategoryQuery({
+ *   variables: {
+ *      categoryId: // value for 'categoryId'
+ *   },
+ * });
+ */
+export function useCategoryQuery(baseOptions: Apollo.QueryHookOptions<CategoryQuery, CategoryQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CategoryQuery, CategoryQueryVariables>(CategoryDocument, options);
+      }
+export function useCategoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CategoryQuery, CategoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CategoryQuery, CategoryQueryVariables>(CategoryDocument, options);
+        }
+export type CategoryQueryHookResult = ReturnType<typeof useCategoryQuery>;
+export type CategoryLazyQueryHookResult = ReturnType<typeof useCategoryLazyQuery>;
+export type CategoryQueryResult = Apollo.QueryResult<CategoryQuery, CategoryQueryVariables>;
 export const MeDocument = gql`
     query me {
   me {
@@ -405,40 +710,210 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
-export const PostsDocument = gql`
-    query Posts {
-  posts {
-    id
-    createdAt
+export const OrdersDocument = gql`
+    query Orders {
+  orders {
+    user {
+      username
+      id
+    }
     updatedAt
-    title
+    status
+    rentalDate
+    id
+    products {
+      product {
+        name
+        price
+      }
+      size
+      updatedAt
+      createdAt
+    }
+    createdAt
+    amount
   }
 }
     `;
 
 /**
- * __usePostsQuery__
+ * __useOrdersQuery__
  *
- * To run a query within a React component, call `usePostsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useOrdersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrdersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = usePostsQuery({
+ * const { data, loading, error } = useOrdersQuery({
  *   variables: {
  *   },
  * });
  */
-export function usePostsQuery(baseOptions?: Apollo.QueryHookOptions<PostsQuery, PostsQueryVariables>) {
+export function useOrdersQuery(baseOptions?: Apollo.QueryHookOptions<OrdersQuery, OrdersQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<PostsQuery, PostsQueryVariables>(PostsDocument, options);
+        return Apollo.useQuery<OrdersQuery, OrdersQueryVariables>(OrdersDocument, options);
       }
-export function usePostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PostsQuery, PostsQueryVariables>) {
+export function useOrdersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OrdersQuery, OrdersQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<PostsQuery, PostsQueryVariables>(PostsDocument, options);
+          return Apollo.useLazyQuery<OrdersQuery, OrdersQueryVariables>(OrdersDocument, options);
         }
-export type PostsQueryHookResult = ReturnType<typeof usePostsQuery>;
-export type PostsLazyQueryHookResult = ReturnType<typeof usePostsLazyQuery>;
-export type PostsQueryResult = Apollo.QueryResult<PostsQuery, PostsQueryVariables>;
+export type OrdersQueryHookResult = ReturnType<typeof useOrdersQuery>;
+export type OrdersLazyQueryHookResult = ReturnType<typeof useOrdersLazyQuery>;
+export type OrdersQueryResult = Apollo.QueryResult<OrdersQuery, OrdersQueryVariables>;
+export const OrderDocument = gql`
+    query Order($orderId: Float!) {
+  order(id: $orderId) {
+    order {
+      user {
+        username
+        id
+      }
+      updatedAt
+      status
+      rentalDate
+      products {
+        size
+        product {
+          price
+          name
+          id
+        }
+      }
+      amount
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useOrderQuery__
+ *
+ * To run a query within a React component, call `useOrderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrderQuery({
+ *   variables: {
+ *      orderId: // value for 'orderId'
+ *   },
+ * });
+ */
+export function useOrderQuery(baseOptions: Apollo.QueryHookOptions<OrderQuery, OrderQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<OrderQuery, OrderQueryVariables>(OrderDocument, options);
+      }
+export function useOrderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OrderQuery, OrderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<OrderQuery, OrderQueryVariables>(OrderDocument, options);
+        }
+export type OrderQueryHookResult = ReturnType<typeof useOrderQuery>;
+export type OrderLazyQueryHookResult = ReturnType<typeof useOrderLazyQuery>;
+export type OrderQueryResult = Apollo.QueryResult<OrderQuery, OrderQueryVariables>;
+export const ProductsDocument = gql`
+    query Products($limit: Int!, $cursor: String) {
+  products(limit: $limit, cursor: $cursor) {
+    hasMore
+    products {
+      price
+      name
+      id
+      description
+      category {
+        name
+        id
+      }
+      photos
+      stock
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `;
+
+/**
+ * __useProductsQuery__
+ *
+ * To run a query within a React component, call `useProductsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProductsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProductsQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function useProductsQuery(baseOptions: Apollo.QueryHookOptions<ProductsQuery, ProductsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ProductsQuery, ProductsQueryVariables>(ProductsDocument, options);
+      }
+export function useProductsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProductsQuery, ProductsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ProductsQuery, ProductsQueryVariables>(ProductsDocument, options);
+        }
+export type ProductsQueryHookResult = ReturnType<typeof useProductsQuery>;
+export type ProductsLazyQueryHookResult = ReturnType<typeof useProductsLazyQuery>;
+export type ProductsQueryResult = Apollo.QueryResult<ProductsQuery, ProductsQueryVariables>;
+export const ProductDocument = gql`
+    query Product($productId: Float!) {
+  product(id: $productId) {
+    product {
+      updatedAt
+      stock
+      price
+      photos
+      name
+      id
+      description
+      createdAt
+      category {
+        name
+        id
+      }
+    }
+    errors {
+      message
+      field
+    }
+  }
+}
+    `;
+
+/**
+ * __useProductQuery__
+ *
+ * To run a query within a React component, call `useProductQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProductQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useProductQuery({
+ *   variables: {
+ *      productId: // value for 'productId'
+ *   },
+ * });
+ */
+export function useProductQuery(baseOptions: Apollo.QueryHookOptions<ProductQuery, ProductQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ProductQuery, ProductQueryVariables>(ProductDocument, options);
+      }
+export function useProductLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProductQuery, ProductQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ProductQuery, ProductQueryVariables>(ProductDocument, options);
+        }
+export type ProductQueryHookResult = ReturnType<typeof useProductQuery>;
+export type ProductLazyQueryHookResult = ReturnType<typeof useProductLazyQuery>;
+export type ProductQueryResult = Apollo.QueryResult<ProductQuery, ProductQueryVariables>;

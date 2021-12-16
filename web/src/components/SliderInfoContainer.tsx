@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import React from "react";
 import styled from "styled-components";
 
@@ -31,7 +32,6 @@ const Button = styled.button`
     align-items: center;
     font-size: 20px;
     width: 500px;
-    background-color: transparent;
     cursor: pointer;
     transition: all 0.5s ease;
     background-color: teal;
@@ -55,11 +55,15 @@ const SliderInfoContainer: React.FC<SliderInfoContainerProps> = ({
     btnText,
     bgColor,
 }) => {
+    const router = useRouter();
+
     return (
         <InfoContainer bgColor={bgColor}>
             <Title>{title.toUpperCase()}</Title>
             <Description>{description.toUpperCase()}</Description>
-            <Button>{btnText.toUpperCase()}</Button>
+            <Button onClick={() => router.push("/products")}>
+                {btnText.toUpperCase()}
+            </Button>
         </InfoContainer>
     );
 };

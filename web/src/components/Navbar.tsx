@@ -1,7 +1,13 @@
+import { Badge } from "@material-ui/core";
+import {
+    FavoriteBorder,
+    FavoriteOutlined,
+    Search,
+    ShoppingCartOutlined,
+} from "@material-ui/icons";
+import NextLink from "next/link";
 import React from "react";
 import styled from "styled-components";
-import { Search, ShoppingCartOutlined } from "@material-ui/icons";
-import { Badge } from "@material-ui/core";
 
 const Container = styled.div`
     height: 60px;
@@ -49,6 +55,7 @@ const Input = styled.input`
 const Logo = styled.span`
     font-weight: bold;
     font-size: 20px;
+    cursor: pointer;
 `;
 
 const MenuItem = styled.div`
@@ -58,6 +65,11 @@ const MenuItem = styled.div`
     padding: 5px;
 `;
 
+const Link = styled.a`
+    text-decoration: none;
+    font-weight: bold;
+`;
+
 const Navbar: React.FC<{}> = ({}) => {
     return (
         <>
@@ -65,20 +77,45 @@ const Navbar: React.FC<{}> = ({}) => {
                 <Wrapper>
                     <Left>
                         <SearchContainer>
-                            <Input placeholder="Pesquisa por tema"/>
-                            <Search style={{ color: "gray", fontSize: 16, cursor: "pointer"}} />
+                            <Input placeholder="Pesquisa por tema" />
+                            <Search
+                                style={{
+                                    color: "gray",
+                                    fontSize: 16,
+                                    cursor: "pointer",
+                                }}
+                            />
                         </SearchContainer>
                     </Left>
                     <Center>
-                        <Logo>SONHO ENCANTADO</Logo>
+                        <NextLink href="/home">
+                            <Logo>SONHO ENCANTADO</Logo>
+                        </NextLink>
                     </Center>
                     <Right>
-                        <MenuItem>CADASTRO</MenuItem>
+                        <MenuItem>
+                            <NextLink href="/register">
+                                <Link>CADASTRO</Link>
+                            </NextLink>
+                        </MenuItem>
 
-                        <MenuItem>ENTRAR</MenuItem>
+                        <MenuItem>
+                            <NextLink href="/login">
+                                <Link >LOGIN</Link>
+                                </NextLink>
+                        </MenuItem>
                         <MenuItem>
                             <Badge badgeContent={1} color="primary">
-                                <ShoppingCartOutlined />
+                                <NextLink href="/cart">
+                                    <FavoriteBorder />
+                                </NextLink>
+                            </Badge>
+                        </MenuItem>
+                        <MenuItem>
+                            <Badge badgeContent={1} color="primary">
+                                <NextLink href="/cart">
+                                    <ShoppingCartOutlined />
+                                </NextLink>
                             </Badge>
                         </MenuItem>
                     </Right>

@@ -1,5 +1,4 @@
 fragment UserFragment on User {
     id
     username
-    avatar
 }

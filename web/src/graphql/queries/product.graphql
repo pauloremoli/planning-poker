@@ -1,0 +1,42 @@
+query Products($limit: Int!, $cursor: String, ) {
+  products(limit: $limit, cursor: $cursor) {
+    hasMore
+    products {
+      price
+      name
+      id
+      description
+      category {
+        name
+        id
+      }
+      photos
+      stock
+      createdAt
+      updatedAt
+    }
+  }
+}
+
+query Product($productId: Float!) {
+  product(id: $productId) {
+    product {
+      updatedAt
+      stock
+      price
+      photos
+      name
+      id
+      description
+      createdAt
+      category {
+        name
+        id
+      }
+    }
+    errors {
+      message
+      field
+    }
+  }
+}

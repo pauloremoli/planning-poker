@@ -5,6 +5,7 @@ import {
 } from "@material-ui/icons";
 import styled from "styled-components";
 import Image from "next/image";
+import NextLink from "next/link";
 
 const Info = styled.div`
     opacity: 0;
@@ -81,20 +82,28 @@ const Product: React.FC<ProductProps> = ({ item }) => {
     return (
         <Container key={item.id}>
             <Image src={item.img} layout="fill" objectFit="cover" />
-            <Info>
-                <Title>{item.title} </Title>
-                <IconContainer>
-                    <Icon>
-                        <ShoppingCartOutlined />
-                    </Icon>
-                    <Icon>
-                        <SearchOutlined />
-                    </Icon>
-                    <Icon>
-                        <FavoriteBorderOutlined />
-                    </Icon>
-                </IconContainer>
-            </Info>
+            <NextLink href={`/product?id=${item.id}`}>
+                <Info>
+                    <Title>{item.title} </Title>
+                    <IconContainer>
+                        <Icon>
+                            <NextLink href={`/cart?id=${item.id}`}>
+                                <ShoppingCartOutlined />
+                            </NextLink>
+                        </Icon>
+                        <Icon>
+                            <NextLink href={`/product?id=${item.id}`}>
+                                <SearchOutlined />
+                            </NextLink>
+                        </Icon>
+                        <Icon>
+                            <NextLink href={`/favorites?id=${item.id}`}>
+                                <FavoriteBorderOutlined />
+                            </NextLink>
+                        </Icon>
+                    </IconContainer>
+                </Info>
+            </NextLink>
         </Container>
     );
 };

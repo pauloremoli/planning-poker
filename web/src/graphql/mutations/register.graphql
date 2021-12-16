@@ -1,11 +1,8 @@
-mutation Register($email: String!, $username: String!, $password: String!, $avatar: String!) {
-    register(username: $username, password: $password, email: $email, avatar: $avatar) {
-        errors {
-            field
-            message
-        }
-        user {
-            ...UserFragment
-        }
+mutation Register($userRole: UserRole!, $idType: IdType!, $identification: String!, $zipCode: String!, $state: String!, $city: String!, $address: String!, $phone: String!, $email: String!, $password: String!, $username: String!) {
+  register(userRole: $userRole, idType: $idType, identification: $identification, zipCode: $zipCode, state: $state, city: $city, address: $address, phone: $phone, email: $email, password: $password, username: $username) {
+    errors {
+      field
+      message
     }
+  }
 }
