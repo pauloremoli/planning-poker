@@ -1,11 +1,4 @@
-import {
-    Facebook,
-    Instagram,
-    MailOutline,
-    Phone,
-    Room,
-    WhatsApp,
-} from "@material-ui/icons";
+import { BsFacebook, BsInstagram, BsWhatsapp } from "react-icons/bs";
 import React from "react";
 import styled from "styled-components";
 import NextLink from "next/link";
@@ -112,7 +105,7 @@ const Footer: React.FC<{}> = ({}) => {
                                 target="_blank"
                                 href="https://www.facebook.com/sonhoencantadopegueemonte/"
                             >
-                                <Facebook />
+                                <BsFacebook />
                             </Link>
                         </SocialIcon>
                         <SocialIcon color="E4405F">
@@ -120,7 +113,7 @@ const Footer: React.FC<{}> = ({}) => {
                                 target="_blank"
                                 href="https://www.instagram.com/sonhoencantado_pegueemonte/"
                             >
-                                <Instagram />
+                                <BsInstagram />
                             </Link>
                         </SocialIcon>
                     </SocialMedia>
@@ -155,8 +148,6 @@ const Footer: React.FC<{}> = ({}) => {
                 <Right>
                     <Title>Contato</Title>
                     <ContactItem>
-                        <Room style={{ marginRight: "10px" }} />
-
                         <Link
                             target="_blank"
                             href="https://goo.gl/maps/haBMhkPbCGqGnSNJ9"
@@ -169,7 +160,7 @@ const Footer: React.FC<{}> = ({}) => {
                             target="_blank"
                             href="https://api.whatsapp.com/send?phone=5512997032001"
                         >
-                            <WhatsApp style={{ marginRight: "10px" }} /> (12)
+                            <BsWhatsapp style={{ marginRight: "10px" }} /> (12)
                             99703-2001
                         </Link>
                     </ContactItem>

@@ -1,4 +1,4 @@
-import { Send } from "@material-ui/icons";
+import { MdSend } from "react-icons/md";
 import styled from "styled-components";
 
 const Container = styled.div`
@@ -50,7 +50,7 @@ const Newsletter: React.FC<{}> = () => {
             <InputContainer>
                 <Input placeholder="Email" />
                 <Button>
-                    <Send />
+                    <MdSend />
                 </Button>
             </InputContainer>
         </Container>

@@ -190,8 +190,6 @@ export class UserResolver {
         @Arg("email") email: string,
         @Ctx() { em, redis }: MyContext
     ) {
-        console.log("forgotPassword", email);
-
         const user = await em.findOne(User, { email });
         if (!user) {
             return {

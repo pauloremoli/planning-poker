@@ -39,23 +39,31 @@ export class ProductResolver {
     @Query(() => ProductsResponse)
     async products(
         @Arg("limit", () => Int) limit: number,
-        @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+        @Arg("cursor", () => String, { nullable: true }) cursor: string | null,
+        @Arg("category", () => Int, { nullable: true }) category: number
     ): Promise<ProductsResponse> {
         const realLimit = Math.min(50, limit);
         const reaLimitPlusOne = realLimit + 1;
         const qb = getConnection()
             .getRepository(Product)
-            .createQueryBuilder("p")
-            .orderBy('p."createdAt"', "DESC")
-            .take(reaLimitPlusOne);
-
+            .createQueryBuilder("product")
+            .leftJoinAndSelect("product.category", "category")
+ 
         if (cursor) {
             qb.where('p."createdAt" < :cursor', {
                 cursor: new Date(parseInt(cursor)),
             });
         }
 
+        console.log(category);
+
+        if (category) {
+            qb.where(`p."categoryId" = ${category}`);
+        }
+
         const products = await qb.getMany();
+
+        console.log(products);
 
         return {
             products: products.slice(0, realLimit),
@@ -95,6 +103,8 @@ export class ProductResolver {
         @Arg("stock") stock: number,
         @Ctx() { em }: MyContext
     ): Promise<ProductResponse> {
+        console.log("CREATE PRODUCT");
+
         const category = await em.findOne(Category, { id: categoryId });
         if (!category) {
             return {

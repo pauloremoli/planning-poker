@@ -1,4 +1,4 @@
-import { ArrowLeftOutlined, ArrowRightOutlined } from "@material-ui/icons";
+import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import Image from "next/image";
 import React, { useState } from "react";
 import styled from "styled-components";
@@ -90,7 +90,7 @@ const Slider: React.FC<{}> = () => {
         <>
             <Container>
                 <Arrow direction="left" onClick={() => handleClick("left")}>
-                    <ArrowLeftOutlined />
+                    <GoChevronLeft />
                 </Arrow>
                 <Wrapper slideIndex={slideIndex}>
                     {sliderData.map((data) => (
@@ -116,7 +116,7 @@ const Slider: React.FC<{}> = () => {
                     ))}
                 </Wrapper>
                 <Arrow direction="right" onClick={() => handleClick("right")}>
-                    <ArrowRightOutlined />
+                    <GoChevronRight />
                 </Arrow>
             </Container>
         </>

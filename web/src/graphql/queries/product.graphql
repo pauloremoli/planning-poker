@@ -1,17 +1,17 @@
-query Products($limit: Int!, $cursor: String, ) {
-  products(limit: $limit, cursor: $cursor) {
+query Products($limit: Int!, $cursor: String, $category: Int) {
+  products(limit: $limit, cursor: $cursor, category: $category) {
     hasMore
     products {
       price
       name
       id
       description
+      photos
+      stock
       category {
         name
         id
       }
-      photos
-      stock
       createdAt
       updatedAt
     }

@@ -1,4 +1,3 @@
-import { Head } from "next/document";
 import React from "react";
 import styled from "styled-components";
 import Announcement from "../components/Announcement";
@@ -19,18 +18,19 @@ const Content = styled.div`
 `;
 
 const Home: React.FC<{}> = ({}) => {
+
     return (
         <>
-            <Announcement />
-            <Navbar />
-            <Slider />
-            <Content>
-                <Categories />
-                <Products />
-                <RecentlyAdded />
-            </Content>
-            <Newsletter />
-            <Footer />
+                <Announcement />
+                <Navbar />
+                <Slider />
+                <Content>
+                    <Categories />
+                    <Products limit={8}/>
+                    <RecentlyAdded />
+                </Content>
+                <Newsletter />
+                <Footer />
         </>
     );
 };

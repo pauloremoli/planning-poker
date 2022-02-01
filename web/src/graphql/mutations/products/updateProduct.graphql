@@ -1,0 +1,12 @@
+mutation UpdateProduct($stock: Float!, $price: Float!, $photos: [String!]!, $categoryId: Float!, $description: String!, $name: String!, $updateProductId: Float!) {
+  updateProduct(stock: $stock, price: $price, photos: $photos, categoryId: $categoryId, description: $description, name: $name, id: $updateProductId) {
+    errors {
+      field
+      message
+    }
+    product {
+      id
+      name
+    }
+  }
+}

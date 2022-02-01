@@ -1,11 +1,10 @@
 import {
-    FavoriteBorderOutlined,
-    SearchOutlined,
-    ShoppingCartOutlined,
-} from "@material-ui/icons";
+    MdFavoriteBorder,
+} from "react-icons/md";
 import styled from "styled-components";
 import Image from "next/image";
 import NextLink from "next/link";
+import { BsCart, BsSearch } from "react-icons/bs";
 
 const Info = styled.div`
     opacity: 0;
@@ -75,7 +74,7 @@ type Item = {
 };
 
 interface ProductProps {
-    item: Item;
+    item: Product
 }
 
 const Product: React.FC<ProductProps> = ({ item }) => {
@@ -88,17 +87,17 @@ const Product: React.FC<ProductProps> = ({ item }) => {
                     <IconContainer>
                         <Icon>
                             <NextLink href={`/cart?id=${item.id}`}>
-                                <ShoppingCartOutlined />
+                                <BsCart />
                             </NextLink>
                         </Icon>
                         <Icon>
                             <NextLink href={`/product?id=${item.id}`}>
-                                <SearchOutlined />
+                                <BsSearch />
                             </NextLink>
                         </Icon>
                         <Icon>
                             <NextLink href={`/favorites?id=${item.id}`}>
-                                <FavoriteBorderOutlined />
+                                <MdFavoriteBorder />
                             </NextLink>
                         </Icon>
                     </IconContainer>

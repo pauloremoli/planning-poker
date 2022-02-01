@@ -1,0 +1,8 @@
+mutation DeleteProduct($id: Float!) {
+  deleteProduct(id: $id) {
+    errors {
+      field
+      message
+    }
+  }
+}

@@ -1,13 +1,13 @@
-import { Badge } from "@material-ui/core";
+
 import {
-    FavoriteBorder,
-    FavoriteOutlined,
-    Search,
-    ShoppingCartOutlined,
-} from "@material-ui/icons";
+    MdFavoriteBorder
+} from "react-icons/md"
+
+
 import NextLink from "next/link";
 import React from "react";
 import styled from "styled-components";
+import { BsCart, BsSearch } from "react-icons/bs";
 
 const Container = styled.div`
     height: 60px;
@@ -78,7 +78,7 @@ const Navbar: React.FC<{}> = ({}) => {
                     <Left>
                         <SearchContainer>
                             <Input placeholder="Pesquisa por tema" />
-                            <Search
+                            <BsSearch
                                 style={{
                                     color: "gray",
                                     fontSize: 16,
@@ -105,18 +105,14 @@ const Navbar: React.FC<{}> = ({}) => {
                                 </NextLink>
                         </MenuItem>
                         <MenuItem>
-                            <Badge badgeContent={1} color="primary">
                                 <NextLink href="/cart">
-                                    <FavoriteBorder />
+                                    <MdFavoriteBorder />
                                 </NextLink>
-                            </Badge>
                         </MenuItem>
                         <MenuItem>
-                            <Badge badgeContent={1} color="primary">
                                 <NextLink href="/cart">
-                                    <ShoppingCartOutlined />
+                                    <BsCart />
                                 </NextLink>
-                            </Badge>
                         </MenuItem>
                     </Right>
                 </Wrapper>

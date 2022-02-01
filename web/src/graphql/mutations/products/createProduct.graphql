@@ -1,0 +1,12 @@
+mutation CreateProduct($stock: Float!, $price: Float!, $photos: [String!]!, $categoryId: Float!, $description: String!, $name: String!) {
+  createProduct(stock: $stock, price: $price, photos: $photos, categoryId: $categoryId, description: $description, name: $name) {
+    errors {
+      field
+      message
+    }
+    product {
+      id
+      name
+    }
+  }
+}
