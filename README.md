@@ -1,10 +1,10 @@
 # Planning Poker
 
 Anonymous, link-only planning poker. No accounts, no server-side storage of
-names or votes — rooms live entirely in the browsers connected to them,
-synced peer-to-peer over WebRTC. A tiny signaling server only helps browsers
-find each other; it never sees room data, and forgets a room the instant
-everyone leaves.
+tasks or any data — rooms live entirely in the browsers connected to them,
+data is exchanged via peer-to-peer over WebRTC. A tiny signaling server only
+helps browsers find each other; it never sees room data, and forgets a room
+the instant everyone leaves.
 
 ## Features
 
@@ -79,6 +79,32 @@ VPS); there's no database and nothing to persist.
 npm run build
 NODE_ENV=production PORT=3001 npm start
 ```
+
+### Deploying to Fly.io
+
+A `Dockerfile` and `fly.toml` are included (built and smoke-tested locally
+with `docker build`/`docker run`). To deploy:
+
+```bash
+# Install flyctl if you don't have it: https://fly.io/docs/flyctl/install/
+fly auth login
+
+# First deploy: creates the app (edit `app = "..."` in fly.toml first, or
+# let `fly launch` pick/confirm a unique name for you)
+fly launch --no-deploy   # generates nothing new here, just registers the app name
+fly deploy
+
+# Later updates
+fly deploy
+```
+
+`fly.toml` runs always-on in Secaucus, NJ (region `ewr`), on the smallest
+machine Fly offers (`shared-cpu-1x`, 256MB): `min_machines_running = 1` and
+`auto_stop_machines = false` keep exactly one machine up at all times (no
+cold starts), and Fly's health check points at `/healthz`. An always-on
+machine won't fall under Fly's scale-to-zero free usage — check
+[fly.io/pricing](https://fly.io/pricing/) for current always-on rates before
+deploying.
 
 ## License
 

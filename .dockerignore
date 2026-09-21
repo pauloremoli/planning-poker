@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+dist
+**/dist
+.git
+.gitignore
+*.md
+.vscode
+.idea
+.env
+.env.*
+Dockerfile
+.dockerignore
+fly.toml
