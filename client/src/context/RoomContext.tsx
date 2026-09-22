@@ -9,11 +9,11 @@ interface RoomContextValue {
   status: ConnectionStatus;
   myPeerId: string;
   isHost: boolean;
-  isAway: boolean;
+  isSpectator: boolean;
   canControlRound: boolean;
   castVote: (value: string | null) => void;
   rename: (name: string) => void;
-  setAway: (away: boolean) => void;
+  setSpectator: (isSpectator: boolean) => void;
   reveal: () => void;
   reset: () => void;
   nextTask: () => void;
@@ -52,11 +52,11 @@ export function RoomProvider({
       status,
       myPeerId,
       isHost: state?.hostPeerId === myPeerId,
-      isAway: me?.away ?? false,
+      isSpectator: me?.isSpectator ?? false,
       canControlRound: me ? hasPermission(me.role, "reveal") : false,
       castVote: (value) => manager?.castVote(value),
       rename: (name) => manager?.rename(name),
-      setAway: (away) => manager?.setAway(away),
+      setSpectator: (isSpectator) => manager?.setSpectator(isSpectator),
       reveal: () => manager?.reveal(),
       reset: () => manager?.reset(),
       nextTask: () => manager?.nextTask(),

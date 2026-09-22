@@ -24,13 +24,13 @@ export function applyHostMessage(state: RoomState, message: DataChannelMessage):
         role: "member",
         vote: null,
         connected: true,
-        away: false,
+        isSpectator: false,
       };
       return { ...state, participants: [...state.participants, participant] };
     }
 
     case "vote-cast": {
-      if (!sender || state.revealed || sender.away) return state;
+      if (!sender || state.revealed || sender.isSpectator) return state;
       return {
         ...state,
         participants: state.participants.map((p) => (p.peerId === message.peerId ? { ...p, vote: message.value } : p)),
@@ -45,13 +45,15 @@ export function applyHostMessage(state: RoomState, message: DataChannelMessage):
       };
     }
 
-    case "set-away": {
+    case "set-spectator": {
       if (!sender) return state;
       return {
         ...state,
-        // Stepping away also clears any in-progress vote — an absent
-        // participant shouldn't silently count toward the round.
-        participants: state.participants.map((p) => (p.peerId === message.peerId ? { ...p, away: message.away, vote: message.away ? null : p.vote } : p)),
+        // Becoming a spectator also clears any in-progress vote — a
+        // non-voting participant shouldn't silently count toward the round.
+        participants: state.participants.map((p) =>
+          p.peerId === message.peerId ? { ...p, isSpectator: message.isSpectator, vote: message.isSpectator ? null : p.vote } : p
+        ),
       };
     }
 
@@ -175,7 +177,7 @@ function senderIdOf(message: DataChannelMessage): string | undefined {
     case "hello":
     case "vote-cast":
     case "rename":
-    case "set-away":
+    case "set-spectator":
     case "request-reveal":
     case "request-reset":
     case "request-next-task":
@@ -198,8 +200,8 @@ export function removeParticipant(state: RoomState, peerId: string): RoomState {
   return { ...state, participants: state.participants.filter((p) => p.peerId !== peerId) };
 }
 
-/** Whether every active (non-away) participant currently has a vote in — the trigger condition for auto-reveal. */
+/** Whether every active (non-spectator) participant currently has a vote in — the trigger condition for auto-reveal. */
 export function everyoneVoted(state: RoomState): boolean {
-  const active = state.participants.filter((p) => !p.away);
+  const active = state.participants.filter((p) => !p.isSpectator);
   return active.length > 0 && active.every((p) => p.vote !== null);
 }

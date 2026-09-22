@@ -12,8 +12,8 @@ export interface Participant {
   role: ParticipantRole;
   vote: string | null;
   connected: boolean;
-  /** Self-service "stepped away" status — doesn't affect permissions, just how the participant is displayed/sorted and whether they can vote. */
-  away: boolean;
+  /** Self-service spectator status — doesn't affect permissions, just how the participant is displayed/sorted and whether they can vote. */
+  isSpectator: boolean;
 }
 
 export interface DeckConfig {
@@ -54,7 +54,7 @@ export interface RoomState {
   currentTaskId: string | null;
   /** Snapshotted each time a task's votes are revealed (overwritten on a later re-vote+reveal of the same task) — the source for the end-of-session summary. */
   taskResults: Record<string, TaskResult>;
-  /** When on, the host auto-reveals 5s after every active (non-away) participant has voted. */
+  /** When on, the host auto-reveals 5s after every active (non-spectator) participant has voted. */
   autoRevealEnabled: boolean;
 }
 
@@ -68,7 +68,7 @@ export type DataChannelMessage =
   | { type: "full-state-sync"; state: RoomState; reason: HostChangeReason }
   | { type: "vote-cast"; peerId: string; value: string | null }
   | { type: "rename"; peerId: string; name: string }
-  | { type: "set-away"; peerId: string; away: boolean }
+  | { type: "set-spectator"; peerId: string; isSpectator: boolean }
   | { type: "request-reveal"; peerId: string }
   /** "Vote again": clears votes for the current task without changing which task is active. */
   | { type: "request-reset"; peerId: string }

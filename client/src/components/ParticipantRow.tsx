@@ -9,17 +9,17 @@ export default function ParticipantRow({ participant }: { participant: Participa
   const isMe = participant.peerId === myPeerId;
   const canManage = isHost && !isMe;
   const voted = participant.vote !== null;
-  const statusClass = participant.away ? "away" : state?.revealed ? "revealed" : voted ? "voted" : "pending";
-  const statusText = participant.away ? "Away" : state?.revealed ? (participant.vote ?? "—") : voted ? "Voted" : "Waiting";
+  const statusClass = participant.isSpectator ? "spectator" : state?.revealed ? "revealed" : voted ? "voted" : "pending";
+  const statusText = participant.isSpectator ? "Spectator" : state?.revealed ? (participant.vote ?? "—") : voted ? "Voted" : "Waiting";
 
   return (
-    <li className={`participant-row${participant.away ? " away" : ""}`}>
+    <li className={`participant-row${participant.isSpectator ? " spectator" : ""}`}>
       <span className="participant-name">
         {participant.name}
         {isMe && <span className="muted">(you)</span>}
         {participant.role === "host" && <span className="badge host">Host</span>}
         {participant.role === "admin" && <span className="badge admin">Admin</span>}
-        {participant.away && <span className="badge">Away</span>}
+        {participant.isSpectator && <span className="badge">Spectator</span>}
       </span>
 
       <div className="row">

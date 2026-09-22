@@ -97,7 +97,7 @@ export class ConnectionManager {
       deck,
       revealed: false,
       round: 0,
-      participants: [{ peerId: this.myPeerId, name: this.myName, joinIndex: 0, role: "host", vote: null, connected: true, away: false }],
+      participants: [{ peerId: this.myPeerId, name: this.myName, joinIndex: 0, role: "host", vote: null, connected: true, isSpectator: false }],
       tasks: [],
       currentTaskId: null,
       taskResults: {},
@@ -126,8 +126,8 @@ export class ConnectionManager {
     this.dispatchAction({ type: "rename", peerId: this.myPeerId, name });
   }
 
-  setAway(away: boolean): void {
-    this.dispatchAction({ type: "set-away", peerId: this.myPeerId, away });
+  setSpectator(isSpectator: boolean): void {
+    this.dispatchAction({ type: "set-spectator", peerId: this.myPeerId, isSpectator });
   }
 
   reveal(): void {
@@ -232,7 +232,7 @@ export class ConnectionManager {
 
   // ---- Auto-reveal ----
   // When enabled, the host reveals automatically once every active
-  // (non-away) participant has voted, after a short grace delay — long
+  // (non-spectator) participant has voted, after a short grace delay — long
   // enough that a genuinely stale/rejected timer firing after we've
   // stopped being host, or after the round moved on, is a safe no-op.
 

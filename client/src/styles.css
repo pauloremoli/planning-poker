@@ -323,7 +323,7 @@ button.subtle:hover:not(:disabled) {
   background: var(--surface-2);
 }
 
-.participant-row.away {
+.participant-row.spectator {
   opacity: 0.6;
 }
 
@@ -396,13 +396,13 @@ button.subtle:hover:not(:disabled) {
   display: none;
 }
 
-.vote-status.away {
+.vote-status.spectator {
   color: var(--text-dim);
   font-style: italic;
   font-weight: 400;
 }
 
-.vote-status.away .vote-dot {
+.vote-status.spectator .vote-dot {
   background: transparent;
   border-style: dashed;
 }

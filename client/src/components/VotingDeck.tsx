@@ -2,7 +2,7 @@ import { useRoom } from "../context/RoomContext";
 import VotingCard from "./VotingCard";
 
 export default function VotingDeck() {
-  const { state, myPeerId, isAway, castVote, setAway } = useRoom();
+  const { state, myPeerId, isSpectator, castVote, setSpectator } = useRoom();
   if (!state) return null;
 
   const myVote = state.participants.find((p) => p.peerId === myPeerId)?.vote ?? null;
@@ -11,12 +11,12 @@ export default function VotingDeck() {
     <div className="card stack">
       <div className="row between">
         <h3>Pick a card</h3>
-        <button className="subtle" onClick={() => setAway(!isAway)}>
-          {isAway ? "I'm back" : "Mark myself away"}
+        <button onClick={() => setSpectator(!isSpectator)}>
+          {isSpectator ? "Join voting" : "Spectator"}
         </button>
       </div>
-      {isAway ? (
-        <p className="muted">You're marked as away and won't be counted for this round. Click "I'm back" to rejoin voting.</p>
+      {isSpectator ? (
+        <p className="muted">You're spectating and won't be counted for this round. Click "Join voting" to vote.</p>
       ) : (
         <div className="deck">
           {state.deck.values.map((value) => (
