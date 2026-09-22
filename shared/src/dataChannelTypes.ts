@@ -82,10 +82,16 @@ export type DataChannelMessage =
   | { type: "request-grant-admin"; peerId: string; targetPeerId: string }
   | { type: "request-revoke-admin"; peerId: string; targetPeerId: string }
   | { type: "request-transfer-host"; peerId: string; targetPeerId: string }
+  | { type: "request-kick"; peerId: string; targetPeerId: string }
+  /** Sent directly to the removed participant right before the host tears down their connection, so their client shows a clear reason instead of a generic disconnect. */
+  | { type: "kicked" }
   | { type: "ping"; ts: number }
   | { type: "pong"; ts: number };
 
-export function hasPermission(role: ParticipantRole, action: "reveal" | "reset" | "set-deck" | "manage-tasks" | "auto-reveal" | "grant-admin" | "revoke-admin" | "transfer-host"): boolean {
+export function hasPermission(
+  role: ParticipantRole,
+  action: "reveal" | "reset" | "set-deck" | "manage-tasks" | "auto-reveal" | "grant-admin" | "revoke-admin" | "transfer-host" | "kick"
+): boolean {
   switch (action) {
     case "reveal":
     case "reset":
@@ -96,6 +102,7 @@ export function hasPermission(role: ParticipantRole, action: "reveal" | "reset" 
     case "grant-admin":
     case "revoke-admin":
     case "transfer-host":
+    case "kick":
       return role === "host";
     default:
       return false;

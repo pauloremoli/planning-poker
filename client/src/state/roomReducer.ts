@@ -145,7 +145,15 @@ export function applyHostMessage(state: RoomState, message: DataChannelMessage):
       };
     }
 
+    case "request-kick": {
+      if (!sender || !hasPermission(sender.role, "kick")) return state;
+      if (message.targetPeerId === message.peerId) return state; // can't kick yourself
+      if (!state.participants.some((p) => p.peerId === message.targetPeerId)) return state;
+      return removeParticipant(state, message.targetPeerId);
+    }
+
     case "full-state-sync":
+    case "kicked":
     case "ping":
     case "pong":
       return state;
@@ -178,6 +186,7 @@ function senderIdOf(message: DataChannelMessage): string | undefined {
     case "request-grant-admin":
     case "request-revoke-admin":
     case "request-transfer-host":
+    case "request-kick":
       return message.peerId;
     default:
       return undefined;

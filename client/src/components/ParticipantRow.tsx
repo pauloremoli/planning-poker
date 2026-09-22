@@ -3,7 +3,7 @@ import type { Participant } from "@planning-poker/shared";
 import { useRoom } from "../context/RoomContext";
 
 export default function ParticipantRow({ participant }: { participant: Participant }) {
-  const { state, myPeerId, isHost, grantAdmin, revokeAdmin, transferHost } = useRoom();
+  const { state, myPeerId, isHost, grantAdmin, revokeAdmin, transferHost, kickParticipant } = useRoom();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isMe = participant.peerId === myPeerId;
@@ -63,6 +63,17 @@ export default function ParticipantRow({ participant }: { participant: Participa
                   }}
                 >
                   Transfer ownership
+                </button>
+                <button
+                  className="danger"
+                  onClick={() => {
+                    if (confirm(`Remove ${participant.name} from the room?`)) {
+                      kickParticipant(participant.peerId);
+                    }
+                    setMenuOpen(false);
+                  }}
+                >
+                  Remove from room
                 </button>
               </div>
             )}

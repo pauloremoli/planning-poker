@@ -25,6 +25,7 @@ interface RoomContextValue {
   grantAdmin: (peerId: string) => void;
   revokeAdmin: (peerId: string) => void;
   transferHost: (peerId: string) => void;
+  kickParticipant: (peerId: string) => void;
 }
 
 const RoomContext = createContext<RoomContextValue | null>(null);
@@ -67,6 +68,7 @@ export function RoomProvider({
       grantAdmin: (peerId) => manager?.grantAdmin(peerId),
       revokeAdmin: (peerId) => manager?.revokeAdmin(peerId),
       transferHost: (peerId) => manager?.transferHost(peerId),
+      kickParticipant: (peerId) => manager?.kickParticipant(peerId),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [manager, state, status, myPeerId]);

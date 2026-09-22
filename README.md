@@ -68,34 +68,6 @@ npm run build        # build the client for production (client/dist)
 npm start             # run the production server (serves client/dist + signaling)
 ```
 
-## Deployment
-
-The server serves both the signaling WebSocket endpoint and the built
-static client from the same origin — a single deployable. It needs a host
-that supports long-lived WebSocket connections (e.g. Fly.io, Render, or any
-VPS); there's no database and nothing to persist.
-
-```bash
-npm run build
-NODE_ENV=production PORT=3001 npm start
-```
-
-### CI / auto-deploy
-
-`.github/workflows/deploy.yml` runs on every push and PR against `main`:
-type-checks and builds all workspaces first; then, only on a push to `main`
-(not PRs) and only once that passes, deploys to Fly.io via `flyctl deploy`.
-
-One-time setup: generate a deploy token and add it as a GitHub Actions
-secret named `FLY_API_TOKEN` (repo Settings → Secrets and variables →
-Actions):
-
-```bash
-fly tokens create deploy -x 999999h
-```
-
-Paste the resulting token as the secret's value. After that, every push to
-`main` auto-deploys.
 
 ## License
 

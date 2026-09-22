@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import type { DeckConfig } from "@planning-poker/shared";
 import { DEFAULT_DECK } from "@planning-poker/shared";
 import { RoomProvider, useRoom } from "../context/RoomContext";
@@ -13,6 +13,7 @@ import ResultsPanel from "../components/ResultsPanel";
 import RoundControls from "../components/RoundControls";
 import TaskPanel from "../components/TaskPanel";
 import SessionSummary from "../components/SessionSummary";
+import BrandHeader from "../components/BrandHeader";
 
 interface NavState {
   mode?: "create" | "join";
@@ -56,30 +57,53 @@ export default function Room() {
 }
 
 function RoomScreen() {
-  const { state, isHost } = useRoom();
+  const { state, status, isHost, canControlRound } = useRoom();
   const shareUrl = `${window.location.origin}/room/${state?.roomId ?? ""}`;
   const [showSummary, setShowSummary] = useState(false);
 
+  if (status === "kicked") {
+    return (
+      <div className="shell">
+        <BrandHeader />
+        <div className="card stack">
+          <h3>You were removed from this room</h3>
+          <p className="muted">The host removed you from this session. You can head back home to create or join a different room.</p>
+          <Link to="/">
+            <button className="primary">Back to home</button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="shell">
-      <div className="brand">
-        Planning<span>Poker</span>
-      </div>
+      <BrandHeader />
       <ConnectionStatusBanner />
       {!state ? (
         <p className="muted">Connecting to room…</p>
       ) : (
         <>
-          {isHost && (
-            <div className="card stack">
-              <h3>Invite others</h3>
-              <QRCodeDisplay url={shareUrl} />
-            </div>
-          )}
+          {/* Everyone: what's being voted on, voting, and the results. */}
           <TaskPanel />
           <VotingDeck />
-          <RoundControls onToggleSummary={() => setShowSummary((s) => !s)} />
           <ResultsPanel />
+
+          {/* Host/admin only: round, task, and deck management — visually
+              set apart from the voting flow above with an accent border. */}
+          {canControlRound && (
+            <div className="admin-zone">
+              <span className="admin-zone-label">Host controls</span>
+              {isHost && (
+                <div className="card stack">
+                  <h3>Invite others</h3>
+                  <QRCodeDisplay url={shareUrl} />
+                </div>
+              )}
+              <RoundControls onToggleSummary={() => setShowSummary((s) => !s)} />
+            </div>
+          )}
+
           <ParticipantList />
           {showSummary && <SessionSummary onClose={() => setShowSummary(false)} />}
         </>

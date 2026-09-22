@@ -10,7 +10,8 @@ export type ConnectionStatus =
   | "connected"
   | "host-disconnected"
   | "reconnecting"
-  | "room-not-found";
+  | "room-not-found"
+  | "kicked";
 
 interface Link {
   pc: RTCPeerConnection;
@@ -188,6 +189,26 @@ export class ConnectionManager {
     // to tear down its side in promoteToHost() — reusing it would leave us
     // both holding a connection the other side has already discarded.
     this.connectToHost(targetPeerId);
+  }
+
+  /** Host-only: forcibly removes a participant. They're told why first (over their still-open link) so their client shows a clear reason instead of a generic disconnect, then — after a brief moment for that message to actually transmit — their connection is torn down; everyone else's view updates immediately. */
+  kickParticipant(targetPeerId: string): void {
+    if (this.role !== "host" || !this.state) return;
+    const next = applyHostMessage(this.state, { type: "request-kick", peerId: this.myPeerId, targetPeerId });
+    if (next === this.state) return;
+
+    this.send(targetPeerId, { type: "kicked" });
+    this.state = next;
+    this.broadcastState("initial");
+    this.emitState();
+
+    setTimeout(() => {
+      const link = this.links.get(targetPeerId);
+      if (link) {
+        this.silenceAndClose(link);
+        this.links.delete(targetPeerId);
+      }
+    }, 300);
   }
 
   private dispatchAction(msg: DataChannelMessage): void {
@@ -448,6 +469,12 @@ export class ConnectionManager {
       return;
     }
 
+    if (msg.type === "kicked") {
+      this.emitStatus("kicked");
+      this.dispose(); // terminal — don't attempt to reconnect
+      return;
+    }
+
     if (msg.type === "full-state-sync") {
       this.applyIncomingState(msg.state);
     }
@@ -581,19 +608,22 @@ export class ConnectionManager {
    * are, from every other participant's perspective, still very much here.
    */
   private teardownAllLinks(): void {
-    for (const link of this.links.values()) {
-      if (link.dc) {
-        link.dc.onopen = null;
-        link.dc.onclose = null;
-        link.dc.onmessage = null;
-        link.dc.close();
-      }
-      link.pc.onconnectionstatechange = null;
-      link.pc.ondatachannel = null;
-      link.pc.onicecandidate = null;
-      link.pc.close();
-    }
+    for (const link of this.links.values()) this.silenceAndClose(link);
     this.links.clear();
+  }
+
+  /** Silences a single link's handlers before closing it — same reasoning as teardownAllLinks, for a one-off deliberate close (e.g. kicking a participant) rather than a full wipe. */
+  private silenceAndClose(link: Link): void {
+    if (link.dc) {
+      link.dc.onopen = null;
+      link.dc.onclose = null;
+      link.dc.onmessage = null;
+      link.dc.close();
+    }
+    link.pc.onconnectionstatechange = null;
+    link.pc.ondatachannel = null;
+    link.pc.onicecandidate = null;
+    link.pc.close();
   }
 
   dispose(): void {
