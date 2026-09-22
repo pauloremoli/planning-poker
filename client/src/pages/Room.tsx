@@ -87,6 +87,7 @@ function RoomScreen() {
           {/* Everyone: what's being voted on, voting, and the results. */}
           <TaskPanel />
           <VotingDeck />
+          <ParticipantList />
           <ResultsPanel />
 
           {/* Host/admin only: round, task, and deck management — visually
@@ -104,7 +105,6 @@ function RoomScreen() {
             </div>
           )}
 
-          <ParticipantList />
           {showSummary && <SessionSummary onClose={() => setShowSummary(false)} />}
         </>
       )}
