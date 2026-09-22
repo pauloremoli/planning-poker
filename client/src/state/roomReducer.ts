@@ -1,5 +1,6 @@
 import type { DataChannelMessage, Participant, RoomState, TaskResult } from "@planning-poker/shared";
 import { hasPermission } from "@planning-poker/shared";
+import { parseVoteValue } from "../utils/deck";
 
 /**
  * Applied only by whoever currently holds the host role, against its
@@ -58,7 +59,7 @@ export function applyHostMessage(state: RoomState, message: DataChannelMessage):
       if (!sender || !hasPermission(sender.role, "reveal")) return state;
       if (!state.currentTaskId) return { ...state, revealed: true };
       const votes = state.participants.filter((p) => p.vote !== null).map((p) => ({ name: p.name, value: p.vote! }));
-      const numeric = votes.map((v) => Number(v.value)).filter((n) => !Number.isNaN(n));
+      const numeric = votes.map((v) => parseVoteValue(v.value)).filter((n): n is number => n !== null);
       const result: TaskResult = { votes, average: numeric.length > 0 ? numeric.reduce((a, b) => a + b, 0) / numeric.length : null };
       return { ...state, revealed: true, taskResults: { ...state.taskResults, [state.currentTaskId]: result } };
     }

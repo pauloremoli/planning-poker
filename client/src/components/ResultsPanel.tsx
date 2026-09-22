@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useRoom } from "../context/RoomContext";
+import { parseVoteValue } from "../utils/deck";
 
 export default function ResultsPanel() {
   const { state } = useRoom();
@@ -7,7 +8,7 @@ export default function ResultsPanel() {
   const summary = useMemo(() => {
     if (!state?.revealed) return null;
     const votes = state.participants.map((p) => p.vote).filter((v): v is string => v !== null);
-    const numeric = votes.map(Number).filter((n) => !Number.isNaN(n));
+    const numeric = votes.map(parseVoteValue).filter((n): n is number => n !== null);
     const average = numeric.length > 0 ? numeric.reduce((a, b) => a + b, 0) / numeric.length : null;
 
     const counts = new Map<string, number>();
