@@ -56,8 +56,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding-left: 16px;
-  border-left: 3px solid var(--accent);
 }
 
 .admin-zone-label {
@@ -65,7 +63,29 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--accent);
+  color: var(--text-dim);
+}
+
+.admin-zone-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 860px) {
+  .shell-wide {
+    max-width: 1000px;
+  }
+
+  .admin-zone-cards {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .admin-zone-cards > * {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 h1, h2, h3 {

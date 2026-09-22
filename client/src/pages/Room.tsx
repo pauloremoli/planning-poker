@@ -77,33 +77,35 @@ function RoomScreen() {
   }
 
   return (
-    <div className="shell">
+    <div className="shell shell-wide">
       <BrandHeader />
       <ConnectionStatusBanner />
       {!state ? (
         <p className="muted">Connecting to room…</p>
       ) : (
         <>
+          {/* Host/admin only: round, task, and deck management — visually
+              set apart from the voting flow below with an accent border. */}
+          {canControlRound && (
+            <div className="admin-zone">
+              <span className="admin-zone-label">Host controls</span>
+              <div className="admin-zone-cards">
+                {isHost && (
+                  <div className="card stack">
+                    <h3>Invite others</h3>
+                    <QRCodeDisplay url={shareUrl} />
+                  </div>
+                )}
+                <RoundControls onToggleSummary={() => setShowSummary((s) => !s)} />
+              </div>
+            </div>
+          )}
+
           {/* Everyone: what's being voted on, voting, and the results. */}
           <TaskPanel />
           <VotingDeck />
           <ParticipantList />
           <ResultsPanel />
-
-          {/* Host/admin only: round, task, and deck management — visually
-              set apart from the voting flow above with an accent border. */}
-          {canControlRound && (
-            <div className="admin-zone">
-              <span className="admin-zone-label">Host controls</span>
-              {isHost && (
-                <div className="card stack">
-                  <h3>Invite others</h3>
-                  <QRCodeDisplay url={shareUrl} />
-                </div>
-              )}
-              <RoundControls onToggleSummary={() => setShowSummary((s) => !s)} />
-            </div>
-          )}
 
           {showSummary && <SessionSummary onClose={() => setShowSummary(false)} />}
         </>
