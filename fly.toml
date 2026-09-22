@@ -1,12 +1,13 @@
-# fly.toml app configuration file generated for planning-poker-p2p on 2026-09-22T01:54:59+02:00
+# fly.toml app configuration file generated for planning2poker on 2026-09-22T01:38:20Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'planning-poker-p2p'
+app = 'planning2poker'
 primary_region = 'ewr'
 
 [build]
+
 [http_service]
   internal_port = 3001
   force_https = true
@@ -25,5 +26,6 @@ primary_region = 'ewr'
 [[vm]]
   size = 'shared-cpu-1x'
   memory = '256mb'
+  cpu_kind = 'shared'
   cpus = 1
   memory_mb = 256
