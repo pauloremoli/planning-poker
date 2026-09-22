@@ -7,16 +7,42 @@ function send(socket: WebSocket, message: ServerToClientMessage): void {
   socket.send(JSON.stringify(message));
 }
 
+// Once a room's WebRTC handshake completes, this socket carries zero
+// application traffic for the rest of the session — everything else flows
+// peer-to-peer. Left alone, that idle connection gets silently dropped by
+// most reverse proxies/load balancers (Fly's edge included) after ~60s,
+// which looks to us like the peer disconnected and quietly deletes the
+// room, even though the browser tab is still open. A protocol-level
+// ping/pong (transparent to the browser — it answers pings automatically,
+// with no client code needed) keeps bytes flowing so that never happens,
+// and doubles as detection for genuinely dead connections.
+const HEARTBEAT_INTERVAL_MS = 25_000;
+
 export class SignalingServer {
   private registry = new RoomRegistry();
+  private aliveSockets = new WeakSet<WebSocket>();
 
   constructor(private wss: WebSocketServer) {
     this.wss.on("connection", (socket) => this.handleConnection(socket));
+    setInterval(() => this.heartbeatTick(), HEARTBEAT_INTERVAL_MS);
   }
 
   private handleConnection(socket: WebSocket): void {
+    this.aliveSockets.add(socket);
+    socket.on("pong", () => this.aliveSockets.add(socket));
     socket.on("message", (raw) => this.handleMessage(socket, raw.toString()));
     socket.on("close", () => this.handleClose(socket));
+  }
+
+  private heartbeatTick(): void {
+    for (const socket of this.wss.clients) {
+      if (!this.aliveSockets.has(socket)) {
+        socket.terminate();
+        continue;
+      }
+      this.aliveSockets.delete(socket);
+      socket.ping();
+    }
   }
 
   private handleMessage(socket: WebSocket, raw: string): void {
