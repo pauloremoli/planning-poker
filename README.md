@@ -80,31 +80,22 @@ npm run build
 NODE_ENV=production PORT=3001 npm start
 ```
 
-### Deploying to Fly.io
+### CI / auto-deploy
 
-A `Dockerfile` and `fly.toml` are included (built and smoke-tested locally
-with `docker build`/`docker run`). To deploy:
+`.github/workflows/deploy.yml` runs on every push and PR against `main`:
+type-checks and builds all workspaces first; then, only on a push to `main`
+(not PRs) and only once that passes, deploys to Fly.io via `flyctl deploy`.
+
+One-time setup: generate a deploy token and add it as a GitHub Actions
+secret named `FLY_API_TOKEN` (repo Settings → Secrets and variables →
+Actions):
 
 ```bash
-# Install flyctl if you don't have it: https://fly.io/docs/flyctl/install/
-fly auth login
-
-# First deploy: creates the app (edit `app = "..."` in fly.toml first, or
-# let `fly launch` pick/confirm a unique name for you)
-fly launch --no-deploy   # generates nothing new here, just registers the app name
-fly deploy
-
-# Later updates
-fly deploy
+fly tokens create deploy -x 999999h
 ```
 
-`fly.toml` runs always-on in Secaucus, NJ (region `ewr`), on the smallest
-machine Fly offers (`shared-cpu-1x`, 256MB): `min_machines_running = 1` and
-`auto_stop_machines = false` keep exactly one machine up at all times (no
-cold starts), and Fly's health check points at `/healthz`. An always-on
-machine won't fall under Fly's scale-to-zero free usage — check
-[fly.io/pricing](https://fly.io/pricing/) for current always-on rates before
-deploying.
+Paste the resulting token as the secret's value. After that, every push to
+`main` auto-deploys.
 
 ## License
 
