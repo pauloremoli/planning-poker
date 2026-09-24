@@ -1,0 +1,18 @@
+[book]
+title = "Planning Poker"
+description = "Anonymous, link-only planning poker — architecture and developer docs"
+authors = ["Paulo Remoli"]
+language = "en"
+src = "docs/src"
+
+[build]
+build-dir = "docs/book"
+
+[output.html]
+git-repository-url = "https://github.com/pauloremoli/planning-poker"
+default-theme = "light"
+preferred-dark-theme = "navy"
+
+[output.html.fold]
+enable = true
+level = 1
