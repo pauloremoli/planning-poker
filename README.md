@@ -35,7 +35,7 @@ npm start            # run the production server (serves client/dist + WebSocket
 
 ## Documentation
 
-- [User guide](docs/src) — how to use the app (built with mdBook: `mdbook serve`)
+- [User guide](https://pauloremoli.github.io/planning2poker/) — how to use the app, published via GitHub Pages (source: [docs/src](docs/src), built with mdBook: `mdbook serve`)
 - [Architecture](architecture.md) — how the app is put together
 
 ## License
