@@ -1,39 +1,36 @@
-import type { DataChannelMessage, Participant, RoomState, TaskResult } from "@planning-poker/shared";
-import { hasPermission } from "@planning-poker/shared";
-import { parseVoteValue } from "../utils/deck";
+import type { Participant, RoomAction, RoomState, TaskResult } from "./dataChannelTypes.js";
+import { hasPermission } from "./dataChannelTypes.js";
+import { parseVoteValue } from "./deck.js";
+
+/** Adds a brand-new participant (not a reconnect — callers check for an existing peerId first). */
+export function addParticipant(state: RoomState, peerId: string, name: string): RoomState {
+  const nextJoinIndex = state.participants.length === 0 ? 0 : Math.max(...state.participants.map((p) => p.joinIndex)) + 1;
+  const participant: Participant = {
+    peerId,
+    name,
+    joinIndex: nextJoinIndex,
+    role: "member",
+    vote: null,
+    connected: true,
+    isSpectator: false,
+  };
+  return { ...state, participants: [...state.participants, participant] };
+}
 
 /**
- * Applied only by whoever currently holds the host role, against its
- * authoritative RoomState, for every inbound app-level DataChannel message
- * (including ones the host "sends to itself" for its own UI actions, so
- * there's exactly one permission-checking code path — see ConnectionManager).
- * Returns the same `state` reference when a message is a no-op or rejected,
- * so callers can cheaply check `next === prev` to skip a broadcast.
+ * Applies one participant-initiated action against the room's authoritative
+ * state. Returns the same `state` reference when an action is a no-op or
+ * rejected, so callers can cheaply check `next === prev` to skip a broadcast.
  */
-export function applyHostMessage(state: RoomState, message: DataChannelMessage): RoomState {
-  const sender = state.participants.find((p) => p.peerId === senderIdOf(message));
+export function applyAction(state: RoomState, action: RoomAction): RoomState {
+  const sender = state.participants.find((p) => p.peerId === action.peerId);
 
-  switch (message.type) {
-    case "hello": {
-      if (state.participants.some((p) => p.peerId === message.peerId)) return state;
-      const nextJoinIndex = state.participants.length === 0 ? 0 : Math.max(...state.participants.map((p) => p.joinIndex)) + 1;
-      const participant: Participant = {
-        peerId: message.peerId,
-        name: message.name,
-        joinIndex: nextJoinIndex,
-        role: "member",
-        vote: null,
-        connected: true,
-        isSpectator: false,
-      };
-      return { ...state, participants: [...state.participants, participant] };
-    }
-
+  switch (action.type) {
     case "vote-cast": {
       if (!sender || state.revealed || sender.isSpectator) return state;
       return {
         ...state,
-        participants: state.participants.map((p) => (p.peerId === message.peerId ? { ...p, vote: message.value } : p)),
+        participants: state.participants.map((p) => (p.peerId === action.peerId ? { ...p, vote: action.value } : p)),
       };
     }
 
@@ -41,7 +38,7 @@ export function applyHostMessage(state: RoomState, message: DataChannelMessage):
       if (!sender) return state;
       return {
         ...state,
-        participants: state.participants.map((p) => (p.peerId === message.peerId ? { ...p, name: message.name } : p)),
+        participants: state.participants.map((p) => (p.peerId === action.peerId ? { ...p, name: action.name } : p)),
       };
     }
 
@@ -52,7 +49,7 @@ export function applyHostMessage(state: RoomState, message: DataChannelMessage):
         // Becoming a spectator also clears any in-progress vote — a
         // non-voting participant shouldn't silently count toward the round.
         participants: state.participants.map((p) =>
-          p.peerId === message.peerId ? { ...p, isSpectator: message.isSpectator, vote: message.isSpectator ? null : p.vote } : p
+          p.peerId === action.peerId ? { ...p, isSpectator: action.isSpectator, vote: action.isSpectator ? null : p.vote } : p
         ),
       };
     }
@@ -80,48 +77,68 @@ export function applyHostMessage(state: RoomState, message: DataChannelMessage):
 
     case "request-set-deck": {
       if (!sender || !hasPermission(sender.role, "set-deck")) return state;
-      return { ...state, deck: message.deck };
+      return { ...state, deck: action.deck };
     }
 
     case "request-set-auto-reveal": {
       if (!sender || !hasPermission(sender.role, "auto-reveal")) return state;
-      return { ...state, autoRevealEnabled: message.enabled };
+      return { ...state, autoRevealEnabled: action.enabled };
     }
 
     case "request-add-task": {
       if (!sender || !hasPermission(sender.role, "manage-tasks")) return state;
-      if (state.tasks.some((t) => t.id === message.task.id)) return state;
+      if (state.tasks.some((t) => t.id === action.task.id)) return state;
       return {
         ...state,
-        tasks: [...state.tasks, message.task],
-        currentTaskId: state.currentTaskId ?? message.task.id,
+        tasks: [...state.tasks, action.task],
+        currentTaskId: state.currentTaskId ?? action.task.id,
+      };
+    }
+
+    case "request-edit-task": {
+      if (!sender || !hasPermission(sender.role, "manage-tasks")) return state;
+      if (!state.tasks.some((t) => t.id === action.taskId)) return state;
+      return {
+        ...state,
+        tasks: state.tasks.map((t) => (t.id === action.taskId ? { ...t, title: action.title, description: action.description } : t)),
       };
     }
 
     case "request-remove-task": {
       if (!sender || !hasPermission(sender.role, "manage-tasks")) return state;
-      const removedIndex = state.tasks.findIndex((t) => t.id === message.taskId);
+      const removedIndex = state.tasks.findIndex((t) => t.id === action.taskId);
       if (removedIndex === -1) return state;
-      const tasks = state.tasks.filter((t) => t.id !== message.taskId);
+      const tasks = state.tasks.filter((t) => t.id !== action.taskId);
       let currentTaskId = state.currentTaskId;
-      if (message.taskId === state.currentTaskId) {
+      if (action.taskId === state.currentTaskId) {
         currentTaskId = tasks[removedIndex]?.id ?? tasks[removedIndex - 1]?.id ?? null;
       }
       return { ...state, tasks, currentTaskId };
     }
 
+    case "request-move-task": {
+      if (!sender || !hasPermission(sender.role, "manage-tasks")) return state;
+      const index = state.tasks.findIndex((t) => t.id === action.taskId);
+      if (index === -1) return state;
+      const swapWith = action.direction === "up" ? index - 1 : index + 1;
+      if (swapWith < 0 || swapWith >= state.tasks.length) return state;
+      const tasks = [...state.tasks];
+      [tasks[index], tasks[swapWith]] = [tasks[swapWith], tasks[index]];
+      return { ...state, tasks };
+    }
+
     case "request-set-current-task": {
       if (!sender || !hasPermission(sender.role, "manage-tasks")) return state;
-      if (!state.tasks.some((t) => t.id === message.taskId)) return state;
-      if (message.taskId === state.currentTaskId) return state;
-      return clearVotes({ ...state, currentTaskId: message.taskId });
+      if (!state.tasks.some((t) => t.id === action.taskId)) return state;
+      if (action.taskId === state.currentTaskId) return state;
+      return clearVotes({ ...state, currentTaskId: action.taskId });
     }
 
     case "request-grant-admin": {
       if (!sender || !hasPermission(sender.role, "grant-admin")) return state;
       return {
         ...state,
-        participants: state.participants.map((p) => (p.peerId === message.targetPeerId ? { ...p, role: "admin" } : p)),
+        participants: state.participants.map((p) => (p.peerId === action.targetPeerId ? { ...p, role: "admin" } : p)),
       };
     }
 
@@ -129,20 +146,20 @@ export function applyHostMessage(state: RoomState, message: DataChannelMessage):
       if (!sender || !hasPermission(sender.role, "revoke-admin")) return state;
       return {
         ...state,
-        participants: state.participants.map((p) => (p.peerId === message.targetPeerId ? { ...p, role: "member" } : p)),
+        participants: state.participants.map((p) => (p.peerId === action.targetPeerId ? { ...p, role: "member" } : p)),
       };
     }
 
     case "request-transfer-host": {
       if (!sender || !hasPermission(sender.role, "transfer-host")) return state;
-      const target = state.participants.find((p) => p.peerId === message.targetPeerId);
+      const target = state.participants.find((p) => p.peerId === action.targetPeerId);
       if (!target || !target.connected) return state;
       return {
         ...state,
-        hostPeerId: message.targetPeerId,
+        hostPeerId: action.targetPeerId,
         participants: state.participants.map((p) => {
-          if (p.peerId === message.targetPeerId) return { ...p, role: "host" };
-          if (p.peerId === message.peerId) return { ...p, role: "admin" }; // outgoing host keeps admin powers
+          if (p.peerId === action.targetPeerId) return { ...p, role: "host" };
+          if (p.peerId === action.peerId) return { ...p, role: "admin" }; // outgoing host keeps admin powers
           return p;
         }),
       };
@@ -150,16 +167,10 @@ export function applyHostMessage(state: RoomState, message: DataChannelMessage):
 
     case "request-kick": {
       if (!sender || !hasPermission(sender.role, "kick")) return state;
-      if (message.targetPeerId === message.peerId) return state; // can't kick yourself
-      if (!state.participants.some((p) => p.peerId === message.targetPeerId)) return state;
-      return removeParticipant(state, message.targetPeerId);
+      if (action.targetPeerId === action.peerId) return state; // can't kick yourself
+      if (!state.participants.some((p) => p.peerId === action.targetPeerId)) return state;
+      return removeParticipant(state, action.targetPeerId);
     }
-
-    case "full-state-sync":
-    case "kicked":
-    case "ping":
-    case "pong":
-      return state;
   }
 }
 
@@ -170,30 +181,6 @@ function clearVotes(state: RoomState): RoomState {
     round: state.round + 1,
     participants: state.participants.map((p) => ({ ...p, vote: null })),
   };
-}
-
-function senderIdOf(message: DataChannelMessage): string | undefined {
-  switch (message.type) {
-    case "hello":
-    case "vote-cast":
-    case "rename":
-    case "set-spectator":
-    case "request-reveal":
-    case "request-reset":
-    case "request-next-task":
-    case "request-set-deck":
-    case "request-set-auto-reveal":
-    case "request-add-task":
-    case "request-remove-task":
-    case "request-set-current-task":
-    case "request-grant-admin":
-    case "request-revoke-admin":
-    case "request-transfer-host":
-    case "request-kick":
-      return message.peerId;
-    default:
-      return undefined;
-  }
 }
 
 export function removeParticipant(state: RoomState, peerId: string): RoomState {

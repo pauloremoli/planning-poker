@@ -9,77 +9,70 @@ export default function ParticipantRow({ participant }: { participant: Participa
   const isMe = participant.peerId === myPeerId;
   const canManage = isHost && !isMe;
   const voted = participant.vote !== null;
-  const statusClass = participant.isSpectator ? "spectator" : state?.revealed ? "revealed" : voted ? "voted" : "pending";
-  const statusText = participant.isSpectator ? "Spectator" : state?.revealed ? (participant.vote ?? "—") : voted ? "Voted" : "Waiting";
+  const statusClass = !participant.connected ? "spectator" : participant.isSpectator ? "spectator" : state?.revealed ? "revealed" : voted ? "voted" : "pending";
+  const title = !participant.connected ? "Reconnecting…" : participant.isSpectator ? "Spectator" : undefined;
 
   return (
-    <li className={`participant-row${participant.isSpectator ? " spectator" : ""}`}>
-      <span className="participant-name">
+    <li className={`participant-chip${participant.isSpectator || !participant.connected ? " spectator" : ""}`}>
+      <span className={`participant-chip-dot ${statusClass}`} title={title} />
+      <span className="participant-chip-name">
         {participant.name}
-        {isMe && <span className="muted">(you)</span>}
-        {participant.role === "host" && <span className="badge host">Host</span>}
-        {participant.role === "admin" && <span className="badge admin">Admin</span>}
-        {participant.isSpectator && <span className="badge">Spectator</span>}
+        {isMe && <span className="muted"> (you)</span>}
       </span>
+      {participant.role === "host" && <span className="badge host">Host</span>}
+      {participant.role === "admin" && <span className="badge admin">Admin</span>}
 
-      <div className="row">
-        <span className={`vote-status ${statusClass}`}>
-          <span className="vote-dot" />
-          {statusText}
-        </span>
-
-        {canManage && (
-          <div className="dropdown-menu">
-            <button className="icon-button" onClick={() => setMenuOpen((o) => !o)} aria-label="Manage participant">
-              ⋯
-            </button>
-            {menuOpen && (
-              <div className="dropdown-menu-panel">
-                {participant.role === "admin" ? (
-                  <button
-                    onClick={() => {
-                      revokeAdmin(participant.peerId);
-                      setMenuOpen(false);
-                    }}
-                  >
-                    Remove admin
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      grantAdmin(participant.peerId);
-                      setMenuOpen(false);
-                    }}
-                  >
-                    Make admin
-                  </button>
-                )}
+      {canManage && (
+        <div className="dropdown-menu">
+          <button className="icon-button" onClick={() => setMenuOpen((o) => !o)} aria-label="Manage participant">
+            ⋯
+          </button>
+          {menuOpen && (
+            <div className="dropdown-menu-panel">
+              {participant.role === "admin" ? (
                 <button
                   onClick={() => {
-                    if (confirm(`Make ${participant.name} the room owner? You'll become an admin.`)) {
-                      transferHost(participant.peerId);
-                    }
+                    revokeAdmin(participant.peerId);
                     setMenuOpen(false);
                   }}
                 >
-                  Transfer ownership
+                  Remove admin
                 </button>
+              ) : (
                 <button
-                  className="danger"
                   onClick={() => {
-                    if (confirm(`Remove ${participant.name} from the room?`)) {
-                      kickParticipant(participant.peerId);
-                    }
+                    grantAdmin(participant.peerId);
                     setMenuOpen(false);
                   }}
                 >
-                  Remove from room
+                  Make admin
                 </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+              )}
+              <button
+                onClick={() => {
+                  if (confirm(`Make ${participant.name} the room owner? You'll become an admin.`)) {
+                    transferHost(participant.peerId);
+                  }
+                  setMenuOpen(false);
+                }}
+              >
+                Transfer ownership
+              </button>
+              <button
+                className="danger"
+                onClick={() => {
+                  if (confirm(`Remove ${participant.name} from the room?`)) {
+                    kickParticipant(participant.peerId);
+                  }
+                  setMenuOpen(false);
+                }}
+              >
+                Remove from room
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </li>
   );
 }

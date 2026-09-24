@@ -20,7 +20,9 @@ interface RoomContextValue {
   setDeck: (deck: DeckConfig) => void;
   setAutoReveal: (enabled: boolean) => void;
   addTask: (title: string, description: string) => void;
+  editTask: (taskId: string, title: string, description: string) => void;
   removeTask: (taskId: string) => void;
+  moveTask: (taskId: string, direction: "up" | "down") => void;
   setCurrentTask: (taskId: string) => void;
   grantAdmin: (peerId: string) => void;
   revokeAdmin: (peerId: string) => void;
@@ -63,7 +65,9 @@ export function RoomProvider({
       setDeck: (deck) => manager?.setDeck(deck),
       setAutoReveal: (enabled) => manager?.setAutoReveal(enabled),
       addTask: (title, description) => manager?.addTask(title, description),
+      editTask: (taskId, title, description) => manager?.editTask(taskId, title, description),
       removeTask: (taskId) => manager?.removeTask(taskId),
+      moveTask: (taskId, direction) => manager?.moveTask(taskId, direction),
       setCurrentTask: (taskId) => manager?.setCurrentTask(taskId),
       grantAdmin: (peerId) => manager?.grantAdmin(peerId),
       revokeAdmin: (peerId) => manager?.revokeAdmin(peerId),

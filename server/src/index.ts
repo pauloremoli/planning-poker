@@ -23,6 +23,10 @@ if (isProduction) {
   });
 }
 
+// Room state lives only in this process's memory (see RoomStore) — running
+// more than one instance would give each its own inconsistent copy of every
+// room. Enforced via `fly deploy --ha=false` (.github/workflows/deploy.yml)
+// and `min_machines_running` in fly.toml; keep it that way.
 const httpServer = createServer(app);
 const wss = new WebSocketServer({ server: httpServer, path: "/ws" });
 new SignalingServer(wss);

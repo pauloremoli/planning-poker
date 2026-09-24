@@ -4,6 +4,7 @@ import type { DeckConfig } from "@planning-poker/shared";
 import { DEFAULT_DECK } from "@planning-poker/shared";
 import { RoomProvider, useRoom } from "../context/RoomContext";
 import { useDisplayName } from "../hooks/useDisplayName";
+import { readSessionStorage, writeSessionStorage } from "../utils/storage";
 import NamePrompt from "../components/NamePrompt";
 import ConnectionStatusBanner from "../components/ConnectionStatusBanner";
 import QRCodeDisplay from "../components/QRCodeDisplay";
@@ -28,10 +29,19 @@ export default function Room() {
   const [storedName, setStoredName] = useDisplayName();
   // Only the "join" path needs an explicit confirm click (even if a stored
   // name pre-fills the prompt); "create" reuses the name already collected
-  // on Home the moment it's available.
-  const [confirmedJoinName, setConfirmedJoinName] = useState<string | null>(null);
+  // on Home the moment it's available. Once confirmed for this room, the
+  // name is remembered for this tab (sessionStorage) so a reload resumes
+  // straight into the room instead of asking again.
+  const [confirmedJoinName, setConfirmedJoinNameState] = useState<string | null>(() =>
+    roomId ? readSessionStorage<string>(`join-name:${roomId}`) : null
+  );
 
   if (!roomId) return null;
+
+  function setConfirmedJoinName(n: string) {
+    setConfirmedJoinNameState(n);
+    writeSessionStorage(`join-name:${roomId}`, n);
+  }
 
   const name = mode === "create" ? storedName : confirmedJoinName;
 
@@ -88,7 +98,6 @@ function RoomScreen() {
               set apart from the voting flow below with an accent border. */}
           {canControlRound && (
             <div className="admin-zone">
-              <span className="admin-zone-label">Host controls</span>
               <div className="admin-zone-cards">
                 {isHost && (
                   <div className="card stack">

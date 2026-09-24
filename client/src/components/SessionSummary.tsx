@@ -18,7 +18,12 @@ function buildSummaryText(state: NonNullable<ReturnType<typeof useRoom>["state"]
         // Distribution only — no participant names, keeping the summary anonymous.
         const counts = new Map<string, number>();
         for (const v of result.votes) counts.set(v.value, (counts.get(v.value) ?? 0) + 1);
-        const distribution = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+        // Ties break by the deck's own card order (e.g. T-shirt sizes), not alphabetically.
+        const deckOrder = (value: string) => {
+          const i = state.deck.values.indexOf(value);
+          return i === -1 ? state.deck.values.length : i;
+        };
+        const distribution = [...counts.entries()].sort((a, b) => b[1] - a[1] || deckOrder(a[0]) - deckOrder(b[0]));
         lines.push(`   Votes: ${distribution.map(([value, count]) => `${value} x${count}`).join(", ")}`);
         lines.push(`   Average: ${result.average !== null ? result.average.toFixed(1) : "n/a"}`);
       } else {

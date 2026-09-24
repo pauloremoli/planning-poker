@@ -17,16 +17,12 @@ export default function VotingDeck() {
       </div>
       {isSpectator ? (
         <p className="muted">You're spectating and won't be counted for this round. Click "Join voting" to vote.</p>
+      ) : state.revealed ? (
+        <p className="muted">Votes are revealed — waiting for the next round to start.</p>
       ) : (
         <div className="deck">
           {state.deck.values.map((value) => (
-            <VotingCard
-              key={value}
-              value={value}
-              selected={myVote === value}
-              disabled={state.revealed}
-              onSelect={() => castVote(myVote === value ? null : value)}
-            />
+            <VotingCard key={value} value={value} selected={myVote === value} onSelect={() => castVote(myVote === value ? null : value)} />
           ))}
         </div>
       )}

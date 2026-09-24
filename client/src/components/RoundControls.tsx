@@ -30,7 +30,7 @@ export default function RoundControls({ onToggleSummary }: { onToggleSummary: ()
       </label>
       <label className="checkbox-row">
         <input type="checkbox" checked={state.autoRevealEnabled} onChange={(e) => setAutoReveal(e.target.checked)} />
-        <span>Auto-reveal 5s after everyone has voted</span>
+        <span>Auto-reveal 2s after everyone has voted</span>
       </label>
     </div>
   );

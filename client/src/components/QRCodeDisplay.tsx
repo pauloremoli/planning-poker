@@ -5,13 +5,29 @@ const canCopyImages = typeof window !== "undefined" && "ClipboardItem" in window
 
 export default function QRCodeDisplay({ url }: { url: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const zoomCanvasRef = useRef<HTMLCanvasElement>(null);
   const [copied, setCopied] = useState(false);
   const [qrCopied, setQrCopied] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
 
   useEffect(() => {
     if (!canvasRef.current) return;
     QRCode.toCanvas(canvasRef.current, url, { width: 180, margin: 1 }).catch(() => {});
   }, [url]);
+
+  useEffect(() => {
+    if (!zoomed || !zoomCanvasRef.current) return;
+    QRCode.toCanvas(zoomCanvasRef.current, url, { width: 480, margin: 1 }).catch(() => {});
+  }, [zoomed, url]);
+
+  useEffect(() => {
+    if (!zoomed) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setZoomed(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [zoomed]);
 
   async function copyLink() {
     try {
@@ -39,9 +55,9 @@ export default function QRCodeDisplay({ url }: { url: string }) {
 
   return (
     <div className="stack">
-      <div className="qr-wrap">
+      <button type="button" className="qr-wrap qr-wrap-button" onClick={() => setZoomed(true)} aria-label="Enlarge QR code">
         <canvas ref={canvasRef} />
-      </div>
+      </button>
       {canCopyImages && (
         <button className="subtle" onClick={copyQrImage}>
           {qrCopied ? "QR code copied!" : "Copy QR code as image"}
@@ -51,6 +67,17 @@ export default function QRCodeDisplay({ url }: { url: string }) {
         <input type="text" readOnly value={url} onFocus={(e) => e.target.select()} />
         <button onClick={copyLink}>{copied ? "Copied!" : "Copy"}</button>
       </div>
+
+      {zoomed && (
+        <div className="qr-zoom-overlay" onClick={() => setZoomed(false)}>
+          <div className="qr-zoom-panel" onClick={(e) => e.stopPropagation()}>
+            <canvas ref={zoomCanvasRef} />
+            <button className="subtle" onClick={() => setZoomed(false)}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
