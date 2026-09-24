@@ -13,5 +13,14 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    setupFiles: ["./vitest.setup.ts"],
+    coverage: {
+      // Without this, v8 only reports files a test actually imported —
+      // untested files (most of the React UI) would silently vanish from
+      // the report instead of showing up as 0%.
+      all: true,
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.test.{ts,tsx}", "src/main.tsx"],
+    },
   },
 });

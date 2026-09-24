@@ -4,7 +4,7 @@ import { hasPermission } from "@planning-poker/shared";
 import { useRoomConnection } from "../hooks/useRoomConnection";
 import type { ConnectionStatus } from "../webrtc/ConnectionManager";
 
-interface RoomContextValue {
+export interface RoomContextValue {
   state: RoomState | null;
   status: ConnectionStatus;
   myPeerId: string;

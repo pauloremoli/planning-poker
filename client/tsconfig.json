@@ -13,7 +13,8 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["@testing-library/jest-dom/vitest"]
   },
-  "include": ["src"]
+  "include": ["src", "vitest.setup.ts"]
 }
